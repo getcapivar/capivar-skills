@@ -13,6 +13,7 @@ node_modules/
 
 # Lockfile local do skills.sh (estado do consumidor, nao do publicador)
 .skill-lock.json
+skills-lock.json
 
 # Lixo de SO / editor
 .DS_Store
