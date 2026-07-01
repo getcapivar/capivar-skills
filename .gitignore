@@ -1,0 +1,20 @@
+# Dependencias
+node_modules/
+
+# Diretorios temporarios de instalacao gerados pelo `npx skills add`
+# (as skills publicaveis vivem em skills/, nao nestes dirs de agente)
+.claude/
+.agents/
+.cursor/
+.codex/
+.gemini/
+.windsurf/
+.cline/
+
+# Lockfile local do skills.sh (estado do consumidor, nao do publicador)
+.skill-lock.json
+
+# Lixo de SO / editor
+.DS_Store
+Thumbs.db
+*.log
