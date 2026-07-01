@@ -62,6 +62,11 @@ npx skills remove discovery
 | `writing-plans` | Capivar (fork de `capivar-writing-plans`) | Preenche o `tasks.md` do trio de spec antes de tocar em código (tabela Progresso = fonte de verdade). |
 | `subagent-driven-development` | Capivar (`capivar-code-docs`) | Executa planos de implementação com tarefas independentes na sessão atual, via subagentes. |
 | `typescript-code-quality` | Capivar | Boas práticas de qualidade de código TypeScript (simplicidade primeiro, tsconfig/lint estritos, sem `any`, validação de fronteira com Zod, unions discriminadas exaustivas, tratamento de erros, async correto). Documento único e autocontido. |
+| `using-git-worktrees` | [obra/superpowers](https://github.com/obra/superpowers) | Garante um workspace isolado (git worktree nativo ou fallback) antes de iniciar feature work que precisa de isolamento ou de executar um plano. |
+| `requesting-code-review` | [obra/superpowers](https://github.com/obra/superpowers) | Solicita revisão de código ao concluir tarefas/features ou antes do merge, para verificar se o trabalho atende aos requisitos. |
+| `finishing-a-development-branch` | [obra/superpowers](https://github.com/obra/superpowers) | Com a implementação concluída e testes passando, apresenta opções estruturadas para integrar o trabalho: merge, PR ou cleanup. |
+| `caveman` | [JuliusBrussee/caveman](https://github.com/JuliusBrussee/caveman) | Modo de comunicação ultra-comprimido (~75% menos tokens) mantendo precisão técnica; níveis lite/full/ultra (+ wenyan). Dispara em "caveman mode" / `/caveman`. |
+| `improve-codebase-architecture` | [mattpocock/skills](https://github.com/mattpocock/skills) | Escaneia o codebase por oportunidades de aprofundamento (deepening), apresenta em relatório HTML visual e faz grilling na opção escolhida. |
 
 ## Estrutura do repositório
 
@@ -90,8 +95,26 @@ O script é **idempotente** e renomeia `capivar-writing-plans` → `writing-plan
 automaticamente. A skill `typescript-code-quality` é autoral deste repositório (não vem do
 sync) e é um `SKILL.md` único e autocontido.
 
+### Skills vendorizadas de terceiros
+
+`using-git-worktrees`, `requesting-code-review`, `finishing-a-development-branch`, `caveman` e
+`improve-codebase-architecture` são cópias (vendored) de repositórios upstream. Para atualizá-las,
+re-rode o comando de origem e recopie a pasta resultante para `skills/<nome>/`:
+
+```bash
+npx skills add https://github.com/obra/superpowers --skill using-git-worktrees --copy -a claude-code
+npx skills add https://github.com/obra/superpowers --skill requesting-code-review --copy -a claude-code
+npx skills add https://github.com/obra/superpowers --skill finishing-a-development-branch --copy -a claude-code
+npx skills add https://github.com/juliusbrussee/caveman --skill caveman --copy -a claude-code
+npx skills add https://github.com/mattpocock/skills --skill improve-codebase-architecture --copy -a claude-code
+# depois: mover de .claude/skills/<nome> para skills/<nome> e remover .claude/
+```
+
 ## Licença
 
-As skills de origem Capivar seguem a licença do projeto Capivar. Skills que futuramente forem
-vendorizadas de terceiros manterão o frontmatter original (autor/licença) de seus repositórios
-de origem, com crédito aos respectivos autores.
+As skills de origem Capivar seguem a licença do projeto Capivar. As skills vendorizadas de
+terceiros mantêm o frontmatter original (autor/licença) de seus repositórios de origem — crédito
+aos respectivos autores:
+[obra/superpowers](https://github.com/obra/superpowers),
+[JuliusBrussee/caveman](https://github.com/JuliusBrussee/caveman),
+[mattpocock/skills](https://github.com/mattpocock/skills).
