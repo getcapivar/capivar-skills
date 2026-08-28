@@ -57,6 +57,7 @@ npx skills remove discovery
 
 | Skill | Origem | Descrição |
 |---|---|---|
+| `create-prompt` | Capivar | Transforma uma ideia crua no **prompt-base** do projeto (`docs/prompts/AAAA-MM-DD-<slug>.md`): decisões fechadas, escolhas técnicas ranqueadas com custo honesto e gatilho de migração, escopo v1 vs Fase 2. Entra **antes** do `/discovery` e do `/specify`. |
 | `discovery` | Capivar (`capivar-code-docs`) | Pesquisa do domínio/codebase **antes** do `/specify`: ensina como a feature funciona, melhores práticas e opções. |
 | `specify` | Capivar (`capivar-code-docs`) | Brainstorm divergente + grilling adversarial → produz CONTEXT.md, ADRs e o trio de spec (requirements/design/tasks). |
 | `writing-plans` | Capivar (fork de `capivar-writing-plans`) | Preenche o `tasks.md` do trio de spec antes de tocar em código (tabela Progresso = fonte de verdade). |
@@ -92,8 +93,11 @@ git add skills/ && git commit -m "chore: sync skills do capivar-code-docs" && gi
 ```
 
 O script é **idempotente** e renomeia `capivar-writing-plans` → `writing-plans`
-automaticamente. A skill `typescript-code-quality` é autoral deste repositório (não vem do
-sync) e é um `SKILL.md` único e autocontido.
+automaticamente. As skills `typescript-code-quality` e `create-prompt` são autorais deste
+repositório (não vêm do sync): a primeira é um `SKILL.md` único e autocontido; a segunda traz
+arquivos auxiliares ao lado do `SKILL.md` — `template.md` (catálogo de seções),
+`review-checklist.md` (validação antes de salvar) e `example-drive-clone.md` (exemplo de
+calibração).
 
 ### Skills vendorizadas de terceiros
 
