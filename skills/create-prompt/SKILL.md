@@ -8,14 +8,16 @@ description: "Use BEFORE /discovery and /specify to turn a rough idea into the p
 Turn a rough idea into the document that describes what will be built and why, at the level of
 stack, architecture and closed decisions. The output is the entry point of the pipeline:
 
-**`/create-prompt` → `/discovery` (optional) → `/specify` → `/writing-plans` →
-`/subagent-driven-development` → `/code-review`**
+**`/create-prompt` → `/discovery` (optional) → `/specify` → `/create-plan` →
+`/subagent-driven-development` → `/requesting-code-review` → `/finishing-a-development-branch`**
+
+From `/specify` there is also an issue-tracker route: `/to-prd` → `/to-issues` → `/create-plan`.
 
 Each skill in that chain answers one question. This one answers **"what are we building, and what
 did we already decide?"** — and it *decides*. `discovery` researches and commits to nothing;
 `specify` hardens what you bring it. **This skill decides; `specify` hardens.**
 
-That division is why this skill does **not** grill. `specify`'s Phase B already owns the relentless
+That division is why this skill does **not** grill. `specify`'s grill already owns the relentless
 adversarial interrogation. If both interrogate, the user answers the same question twice and stops
 using one of them. Here you propose, and the user corrects.
 
@@ -143,8 +145,8 @@ What to ask, what to assume, what never to ask:
 - **Assume and mark** — derivable and cheap to correct: stack details visible in the manifest,
   naming and folder conventions, test strategy, lint tooling, error envelope, observability
   defaults, accessibility baseline.
-- **Never ask** — anything a file in the repo answers. Read it instead. (Same rule as `discovery`
-  step 3 and `specify` Phase A step 3.)
+- **Never ask** — anything a file in the repo answers. Read it instead. (Same rule `discovery` and
+  `specify` follow: if the codebase can answer it, explore instead of asking.)
 
 **7. Write the rankings** for the decisions named in step 5, following the gabarito in
 [template.md](template.md). Respect its invariants — `Custo honesto:` exactly once and on the
@@ -196,12 +198,12 @@ boundary. An unmarked tree is unreviewable.
 
 - **Not prompt engineering for an LLM call.** This produces a project briefing, not a system prompt,
   not a template for an API request.
-- **Not a grill.** `specify` Phase B owns the adversarial pass. Here you propose and the user
+- **Not a grill.** `specify`'s grill owns the adversarial pass. Here you propose and the user
   corrects, inside a hard interview budget.
 - **Not research.** When the technology itself is uncertain, that is `/discovery`. This skill
   decides from what it can read and verify; what it cannot close becomes an open question.
 - **Not a spec, and not a plan.** No acceptance criteria, no tasks, no estimates. `specify` writes
-  the contract; `writing-plans` writes the order.
+  the contract; `create-plan` writes the order.
 - **Not implementation.** One markdown file. No scaffolding, no dependencies, no code.
 - **Not a place for secrets.** The inventory names variables and says what is never embedded. A
   value never appears.
@@ -213,10 +215,10 @@ Route by what is still open, then stop:
 - **Open questions about HOW to build it** (the technology is uncertain, the approach is not
   obvious) → `/discovery`, pointed at this document. It researches and brings evidence; you come
   back and revise the prompt.
-- **Open questions about WHAT to build** (clear on paper, not closed) → `/specify`. Its Phase A
-  starts from this document; its Phase B grills against it.
-- **Nothing open** → `/specify` directly: "requirements-first, base em `docs/prompts/<arquivo>`".
-  Then `/writing-plans` fills the spec trio's `tasks.md`.
+- **Open questions about WHAT to build** (clear on paper, not closed) → `/specify`. Its brainstorm
+  starts from this document; its grill hardens it against the glossary and the ADRs.
+- **Nothing open** → `/specify` directly, pointed at `docs/prompts/<arquivo>`. It produces the
+  design doc; then `/create-plan` turns it into the implementation plan.
 
 Say which one you would pick and why. Then wait. Do NOT invoke any of them yourself.
 
