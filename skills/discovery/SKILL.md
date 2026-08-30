@@ -7,9 +7,11 @@ description: "Use BEFORE /specify when you don't yet know WHAT to build or HOW. 
 
 Discovery is the **research phase that runs before `specify`**. `specify` hardens an idea you already know how to build; **discovery is where you figure out *how* it should be built, *what* the best practices are, and *which* opportunities are worth pursuing — before any spec exists.**
 
-This is a **Capivar-specific skill** (mirrored in `.claude/skills/discovery/` and `.agents/skills/discovery/`). The full pipeline is:
+The full pipeline is:
 
-**`/discovery` → `/specify` → `/capivar-writing-plans` → `/subagent-driven-development` → `/code-review`**
+**`/create-prompt` → `/discovery` → `/specify` → `/create-plan` → `/subagent-driven-development` → `/requesting-code-review` → `/finishing-a-development-branch`**
+
+From `/specify` there is also an issue-tracker route: `/to-prd` → `/to-issues` → `/create-plan`.
 
 Discovery is the **optional first step**. Skip straight to `/specify` only when you already know the shape of the solution.
 
@@ -31,7 +33,7 @@ Be divergent and curious, but **evidence-driven**: every claim about "how others
 
 The deliverable is a **discovery brief**: the synthesis of domain map, users & pains, existing alternatives, best-practices findings (cited), mapped opportunities, candidate approaches with trade-offs, a recommendation, and the open questions for `specify`. Present it inline first.
 
-**Persisting it is opt-in.** Saving the brief as a dated `docs/discovery/YYYY-MM-DD-<topic>.md` (structured like `docs/discovery/_TEMPLATE.md`) happens ONLY if the user says yes at the save gate (step 6). Never write or commit it automatically. When saved, it's one file — lighter than a spec trio, because discovery is a research note, not a contract.
+**Persisting it is opt-in.** Saving the brief as a dated `docs/discovery/YYYY-MM-DD-<topic>.md` happens ONLY if the user says yes at the save gate (step 6). Never write or commit it automatically. It is a research note, not a contract — `specify` is what turns findings into something the team commits to.
 
 ## Process
 
@@ -48,7 +50,7 @@ Create a task per step and complete them in order:
 5. **Synthesize and present the brief** — teach the user what you found: the domain map (what it is, how it works here today), users & pains, existing alternatives, best-practices findings (cited), mapped opportunities, **2-3 candidate approaches with trade-offs**, a recommendation, and the open questions that `specify` must resolve. Discovery **proposes**; it does not decide the final stack.
 
 6. **Save gate — ask first, never auto-save.** Ask the user whether to save the brief to `docs/discovery/YYYY-MM-DD-<topic>.md`:
-   - **Yes** → write the file (structured like `docs/discovery/_TEMPLATE.md`) and offer to commit it.
+   - **Yes** → write the file and offer to commit it.
    - **No** → do NOT create anything under `docs/discovery/`. The brief stays in this conversation only.
 
 7. **Hand off.** Whatever the save choice, tell the user: "Discovery done. When you know the shape you want, run `/specify` — point it at this brief (the saved file, or this conversation). That's where we pin the definition down." Wait. Do NOT invoke `specify` yourself.

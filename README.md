@@ -16,7 +16,7 @@ npx skills add getcapivar/capivar-skills
 npx skills add getcapivar/capivar-skills --skill discovery
 
 # Instalar várias skills específicas de uma vez
-npx skills add getcapivar/capivar-skills --skill specify --skill writing-plans
+npx skills add getcapivar/capivar-skills --skill specify --skill create-plan
 
 # Instalar para agentes específicos (ex.: Claude Code e Cursor)
 npx skills add getcapivar/capivar-skills -a claude-code -a cursor
@@ -58,10 +58,12 @@ npx skills remove discovery
 | Skill | Origem | Descrição |
 |---|---|---|
 | `create-prompt` | Capivar | Transforma uma ideia crua no **prompt-base** do projeto (`docs/prompts/AAAA-MM-DD-<slug>.md`): decisões fechadas, escolhas técnicas ranqueadas com custo honesto e gatilho de migração, escopo v1 vs Fase 2. Entra **antes** do `/discovery` e do `/specify`. |
-| `discovery` | Capivar (`capivar-code-docs`) | Pesquisa do domínio/codebase **antes** do `/specify`: ensina como a feature funciona, melhores práticas e opções. |
-| `specify` | Capivar (`capivar-code-docs`) | Brainstorm divergente + grilling adversarial → produz CONTEXT.md, ADRs e o trio de spec (requirements/design/tasks). |
-| `writing-plans` | Capivar (fork de `capivar-writing-plans`) | Preenche o `tasks.md` do trio de spec antes de tocar em código (tabela Progresso = fonte de verdade). |
-| `subagent-driven-development` | Capivar (`capivar-code-docs`) | Executa planos de implementação com tarefas independentes na sessão atual, via subagentes. |
+| `discovery` | Capivar | Pesquisa do domínio/codebase **antes** do `/specify`: ensina como a feature funciona, melhores práticas e opções. |
+| `specify` | Capivar (fork de [obra/superpowers](https://github.com/obra/superpowers)) | Brainstorm colaborativo + grilling adversarial contra o glossário e os ADRs → produz `docs/specs/AAAA-MM-DD-<topic>-design.md`, entradas no `CONTEXT.md` e ADRs. Inclui o visual companion. |
+| `to-prd` | Capivar (`capivar-code-docs`) | Transforma o contexto da conversa num PRD e publica como issue via `gh`. Rota de issue tracker. |
+| `to-issues` | Capivar (`capivar-code-docs`) | Quebra um plano/spec/PRD em issues independentes por fatias verticais (tracer bullets), via `gh`. Rota de issue tracker. |
+| `create-plan` | Capivar (fork de [obra/superpowers](https://github.com/obra/superpowers)) | Escreve o plano de implementação em `docs/plans/AAAA-MM-DD-<feature-name>.md`: tarefas bite-sized com caminhos exatos, código completo e passos de verificação. |
+| `subagent-driven-development` | Capivar | Executa planos de implementação com tarefas independentes na sessão atual, via subagentes. |
 | `typescript-code-quality` | Capivar | Boas práticas de qualidade de código TypeScript (simplicidade primeiro, tsconfig/lint estritos, sem `any`, validação de fronteira com Zod, unions discriminadas exaustivas, tratamento de erros, async correto). Documento único e autocontido. |
 | `using-git-worktrees` | [obra/superpowers](https://github.com/obra/superpowers) | Garante um workspace isolado (git worktree nativo ou fallback) antes de iniciar feature work que precisa de isolamento ou de executar um plano. |
 | `requesting-code-review` | [obra/superpowers](https://github.com/obra/superpowers) | Solicita revisão de código ao concluir tarefas/features ou antes do merge, para verificar se o trabalho atende aos requisitos. |
@@ -73,31 +75,35 @@ npx skills remove discovery
 
 ```
 skills/<nome>/SKILL.md      # cada skill; layout descoberto automaticamente pelo `npx skills add`
-scripts/sync.mjs            # sincroniza as skills de origem Capivar a partir do capivar-code-docs
+```
+
+## Pipeline
+
+As skills do fluxo principal se encadeiam nesta ordem, e cada uma cita a próxima pelo nome:
+
+```
+/create-prompt → /discovery (opcional) → /specify ─┬─ enxuta ─────────────────► /create-plan
+                                                    └─ issue tracker → /to-prd → /to-issues → /create-plan
+
+/create-plan → /subagent-driven-development → /requesting-code-review → /finishing-a-development-branch
 ```
 
 ## Manutenção
 
-### Skills de origem Capivar (fonte de verdade: `capivar-code-docs`)
+### Skills autorais deste repositório
 
-`discovery`, `specify`, `writing-plans` e `subagent-driven-development` são mantidas no
-monorepo `capivar-code-docs` (`.agents/skills/`). Para trazer as versões mais recentes para
-este repositório:
+`create-prompt`, `discovery`, `specify`, `to-prd`, `to-issues`, `create-plan`,
+`subagent-driven-development` e `typescript-code-quality` são mantidas **aqui** — este repositório
+é a fonte de verdade delas. Edite direto em `skills/<nome>/` e commite.
 
-```bash
-node scripts/sync.mjs
-# fonte alternativa:
-# CAPIVAR_SKILLS_SRC=/caminho/para/.agents/skills node scripts/sync.mjs
-
-git add skills/ && git commit -m "chore: sync skills do capivar-code-docs" && git push
-```
-
-O script é **idempotente** e renomeia `capivar-writing-plans` → `writing-plans`
-automaticamente. As skills `typescript-code-quality` e `create-prompt` são autorais deste
-repositório (não vêm do sync): a primeira é um `SKILL.md` único e autocontido; a segunda traz
-arquivos auxiliares ao lado do `SKILL.md` — `template.md` (catálogo de seções),
-`review-checklist.md` (validação antes de salvar) e `example-drive-clone.md` (exemplo de
-calibração).
+- `specify` e `create-plan` são forks de [obra/superpowers](https://github.com/obra/superpowers)
+  (`brainstorming` e `writing-plans`), com o caminho de saída trocado para `docs/specs/` e
+  `docs/plans/`; a `specify` acrescenta a fase de grilling e traz o visual companion
+  (`visual-companion.md` + `scripts/`).
+- `to-prd` e `to-issues` foram extraídas do `capivar-code-docs` (onde se chamavam
+  `capivar-to-prd` / `capivar-to-issues`) e dependem do `gh` CLI.
+- `create-prompt` traz auxiliares ao lado do `SKILL.md`: `template.md` (catálogo de seções),
+  `review-checklist.md` (validação antes de salvar) e `example-drive-clone.md` (calibração).
 
 ### Skills vendorizadas de terceiros
 
@@ -116,9 +122,12 @@ npx skills add https://github.com/mattpocock/skills --skill improve-codebase-arc
 
 ## Licença
 
-As skills de origem Capivar seguem a licença do projeto Capivar. As skills vendorizadas de
-terceiros mantêm o frontmatter original (autor/licença) de seus repositórios de origem — crédito
-aos respectivos autores:
+As skills autorais seguem a licença do projeto Capivar. As skills vendorizadas de terceiros mantêm
+o frontmatter original (autor/licença) de seus repositórios de origem.
+
+As skills `specify` e `create-plan` são **trabalhos derivados** de `brainstorming` e `writing-plans`
+do [obra/superpowers](https://github.com/obra/superpowers) (MIT, Jesse Vincent) — o texto, o
+checklist, o fluxo e os scripts do visual companion vêm de lá. Crédito aos respectivos autores:
 [obra/superpowers](https://github.com/obra/superpowers),
 [JuliusBrussee/caveman](https://github.com/JuliusBrussee/caveman),
 [mattpocock/skills](https://github.com/mattpocock/skills).
