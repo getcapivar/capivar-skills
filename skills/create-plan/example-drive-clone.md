@@ -1,4 +1,4 @@
-# Prompt — Clone do Google Drive (upload direto ao storage, `.zip` e compartilhamento revogável)
+# Plano — Clone do Google Drive (upload direto ao storage, `.zip` e compartilhamento revogável)
 
 **Papel:** atue como um desenvolvedor Full-stack Sênior com forte experiência em **sistemas de
 armazenamento de arquivos em escala**, **segurança de upload e de conteúdo servido de volta a

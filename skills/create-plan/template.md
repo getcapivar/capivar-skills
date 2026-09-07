@@ -69,7 +69,7 @@ the volatile status lives in the index table of `docs/plans/README.md`. A `statu
 the file is a field nobody updates.
 
 ```md
-# Prompt — <Nome> (<3–4 dimensões difíceis, não a stack>)
+# Plano — <Nome> (<3–4 dimensões difíceis, não a stack>)
 
 **Papel:** atue como <senioridade e especialidade>, com forte experiência em
 <especialização 1>, <especialização 2> e <especialização 3>.
