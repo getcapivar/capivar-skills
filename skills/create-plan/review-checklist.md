@@ -1,4 +1,4 @@
-# Prompt-base review checklist
+# Implementation plan review checklist
 
 Run this against the file **on disk** — read it back, do not grade what you meant to write. The
 gap between intention and text is the entire point of this pass.
@@ -13,7 +13,7 @@ risk) or carries more than two ranking sections. Otherwise offer it and let the 
 
 **Subagent prompt:**
 
-> Read `<absolute path>`. It is a Portuguese-language project briefing. Run every check below and
+> Read `<absolute path>`. It is a Portuguese-language implementation plan. Run every check below and
 > report each one as PASS or FAIL with the offending line quoted. You have no context beyond the
 > file itself — that is deliberate. If something only makes sense to someone who was in the
 > conversation that produced it, that is a FAIL, not a thing to overlook. Do not fix anything;
@@ -31,9 +31,24 @@ caveat gets skipped and the defect ships.
 - [ ] Sumário, if present, matches the real headings exactly (it is generated last, or it is wrong)
 - [ ] `---` between every section; prose hard-wrapped at 100 columns; **no table row wrapped**
 - [ ] Emoji only 🥇🥈🥉, only in ranking headings — nothing decorative anywhere
-- [ ] `- [ ]` checkboxes appear **only** in Resultado esperado
-- [ ] No non-ranking section exceeds 400 words
-- [ ] No implementation code. Fenced blocks only for the file tree and state machines
+- [ ] `- [ ]` checkboxes appear **only** in Resultado esperado and in the Parte VII tasks
+- [ ] No non-ranking section exceeds 400 words. The §4 diagram fence does not count — the prose
+      around it stays under 150 words — and Parte VII is outside the budget entirely
+- [ ] Parts I–VI: no implementation code, and fenced blocks only for the architecture diagram, the
+      file tree and state machines. Parte VII: code blocks present, because there they are required
+
+## Arquitetura (§4)
+
+- [ ] §4 carries an ASCII diagram in a fence, and **every box in the drawing has a row in the legend
+      table** — and every legend row has a box
+- [ ] Every component named anywhere else in the document appears in the diagram, or is explicitly
+      declared out of scope
+- [ ] The diagram draws processes, services and the boundaries that host them — not generic tiers.
+      "Frontend → Backend → Banco" fails the name-swap test and is not a topology
+- [ ] **Fronteiras invariáveis** names at least 2 arrows that may never exist, each with what breaks
+      if it does
+- [ ] No placeholder from the template skeleton survives (`<proc A>`, `<port>`, `<protocolo>`)
+- [ ] §4 does not restate §9 — it says *where things run*, not *how the hard part works*
 
 ## Header
 
@@ -102,16 +117,35 @@ adequado | apropriado | robusto | escalável | moderno | performático | conside
 - [ ] Inventário: the "nunca embarcado" list is non-empty for anything shipped to a third party's
       machine, and **no secret appears with a value**
 - [ ] Every Resultado esperado item is demonstrable by a human and maps to a section
-- [ ] Ordem de execução item 1 is **not** "crie o repositório" / "instale as dependências" — it is
-      non-code work, a measurement, or the largest risk
+- [ ] The Parte VII preamble's item 1 is **not** "crie o repositório" / "instale as dependências" —
+      it is non-code work, a measurement, or the largest risk
+
+## Tarefas (Parte VII)
+
+- [ ] Every task carries `**Files:**` (exact paths), `**Interfaces:**` (Consumes/Produces with real
+      signatures) and steps with real code blocks. `/subagent-driven-development` extracts each
+      task's full text and hands it to a subagent that sees nothing else — a step without its code
+      is a task nobody can run
+- [ ] No placeholder from the "Sem placeholders" list survives — in particular no "igual à Tarefa N"
+- [ ] Types, functions and signatures used in a later task were defined in an earlier one, under the
+      same names
+- [ ] Tasks implement the **v1** of §18 only. Nothing from Fase 2 became a task, and no task
+      rests on a question still listed under `Perguntas em aberto`
+- [ ] **The last task creates `<target>/ARCHITECTURE.md`** from §4, and its Mermaid graph carries
+      the same nodes and the same directions as the ASCII diagram
 
 ## File
 
-- [ ] Path is `<target>/docs/prompts/AAAA-MM-DD-<slug>.md` — **in the target repo, never in the
+- [ ] Path is `<target>/docs/plans/AAAA-MM-DD-<slug>.md` — **in the target repo, never in the
       skills repository**
-- [ ] Date is the creation date; slug identifies the target and does not contain the word "prompt"
-- [ ] `docs/prompts/README.md` exists and its index table includes this document
-- [ ] Nothing was created outside `docs/prompts/` — no scaffolding, no config, no source file
+- [ ] Date is the creation date; slug identifies the target and does not contain the word "plano"
+- [ ] `docs/plans/README.md` exists and its index table includes this document
+- [ ] Nothing was created outside `docs/plans/` — no scaffolding, no config, no source file, and
+      **no `ARCHITECTURE.md` at the repository root**: that file is the last task of the plan,
+      not an output of this skill
+- [ ] **No file was written before the user approved the plan at GATE 2.** The only admissible
+      exception is `CONTEXT.md` / `docs/adr/`, and only when the grill was `grill-with-docs`. This
+      plan is the first file this skill created
 
 ---
 
