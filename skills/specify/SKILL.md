@@ -8,18 +8,25 @@ description: "You MUST use this before any creative work - creating features, bu
 Help turn ideas into fully formed designs through natural collaborative dialogue, then harden the
 chosen design against what the project already decided.
 
+**This skill is optional.** The fast lane is `/create-plan` on its own: it decides, grills and
+produces the implementation plan in one pass. Reach for `specify` when the *definition* deserves its
+own round — when what the thing does, for whom, and with what boundaries is still being argued, and
+a design doc plus a sharpened glossary is worth having before any plan exists. Its output feeds
+`/create-plan`, and running it here **narrows** the grill there instead of repeating it: terminology
+closed in this session is not re-litigated later.
+
 Start by understanding the current project context, then ask questions one at a time to refine the
 idea. Once you understand what you're building, present the design and get user approval. Then, and
 only then, turn adversarial: the grill is where a design that sounded right stops being plausible
 and starts being precise.
 
 <HARD-GATE>
-Do NOT invoke any implementation skill, write any code, scaffold any project, or take any implementation action until you have presented a design and the user has approved it. This applies to EVERY project regardless of perceived simplicity.
+Do NOT invoke any implementation skill, write any code, scaffold any project, or take any implementation action until you have presented a design and the user has approved it. This applies to every project that runs this skill, regardless of perceived simplicity.
 </HARD-GATE>
 
 ## Anti-Pattern: "This Is Too Simple To Need A Design"
 
-Every project goes through this process. A todo list, a single-function utility, a config change — all of them. "Simple" projects are where unexamined assumptions cause the most wasted work. The design can be short (a few sentences for truly simple projects), but you MUST present it and get approval.
+Once a project is in this skill, it gets a design — a todo list, a single-function utility, a config change, all of them. "Simple" projects are where unexamined assumptions cause the most wasted work. The design can be short (a few sentences for truly simple projects), but you MUST present it and get approval. (Whether a project enters *this* skill at all is the user's call: `/create-plan` alone is a complete route.)
 
 ## Checklist
 
@@ -167,7 +174,7 @@ Wait for the user's response. If they request changes, make them and re-run the 
 
 Only after approval, offer the two routes and let the user pick:
 
-- **Lean loop** → invoke `create-plan`, which writes `docs/plans/YYYY-MM-DD-<feature-name>.md`.
+- **Lean loop** → invoke `create-plan`, which writes `docs/plans/AAAA-MM-DD-<slug>.md`: closed decisions, the runtime architecture diagram, ranked choices, v1 vs Fase 2, and the bite-sized tasks that implement it. Tell it this spec exists — its grill runs narrowed, on the plan's decisions and tasks, not on terminology already closed here.
 - **Issue tracker** → invoke `to-prd` (publishes a PRD as a GitHub issue), then `to-issues` (breaks it into vertical-slice tickets), then `create-plan`.
 
 Do NOT invoke any other skill. Planning is the next step.

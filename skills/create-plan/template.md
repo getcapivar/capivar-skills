@@ -1,6 +1,6 @@
-# Prompt-base template
+# Implementation plan template
 
-The section catalog for the document `create-prompt` produces. Read this file at step 5 of
+The section catalog for the document `create-plan` produces. Read this file at step 5 of
 `SKILL.md` — at compose time, not from memory. Paraphrasing this catalog from context is how a
 document ends up with twenty generic sections.
 
@@ -27,9 +27,9 @@ Every rule below was derived by measuring the reference document, not by taste.
 | Table rows **never** wrap — one logical row, one physical line | table rows run to 187 columns |
 | `---` between every `##` section | 29 horizontal rules for 28 sections |
 | Emoji: **only** 🥇🥈🥉, **only** in ranking headings | 6 emoji in 716 lines |
-| `- [ ]` checklists **only** in the Resultado esperado section | 12 checkboxes, 100% in one section |
-| Fenced blocks only for two-dimensional structure (file tree, state machine) | 2 blocks in 716 lines |
-| **Zero implementation code** | the document feeds `/specify`, which must stay free to design |
+| `- [ ]` checklists only in Resultado esperado **and** in the Parte VII tasks | 12 checkboxes, 100% in one section, before Parte VII existed |
+| Parts I–VI: fenced blocks only for two-dimensional structure (architecture diagram, file tree, state machine) | 2 blocks in 716 lines, before §4 existed |
+| **Zero implementation code in Parts I–VI** — and code **required** in Parte VII | the decision sections must stay free to design; the tasks must be runnable |
 | Bold ~1 span per 20 words; backticks on every identifier, path, flag, package | 299 bold / 154 code spans |
 | Number every `##`; cross-reference always as `§N`, never "ver acima" | 24 uses |
 | Second person reserved for the honest-cost line — max 2 per document | 1 occurrence in 6,107 words |
@@ -43,14 +43,20 @@ Impersonal present for facts ("O corpo do app é idêntico nas duas plataformas"
 lines (ceiling 400). Ordinary section 60–300 words, **ceiling 400** — no non-ranking section in the
 reference exceeds 305. Ranking section 350–750 words.
 
+**What the ceilings do not count.** The §4 diagram fence is excluded from both the word ceiling and
+the line ceiling — the prose around it gets its own budget of 150 words. **Parte VII is excluded
+from the line ceiling entirely:** it scales with the work to be done, not with how much there is to
+say. A plan whose tasks are long is not padded; a plan whose *sections* are long usually is.
+
 **The per-section ceiling is the one that bites.** The document-level number scales with how many
 sections the product genuinely earns — a 30-section application with three five-option rankings
 lands near 850 without a word of padding, and [example-drive-clone.md](example-drive-clone.md) is
 exactly that. Treat a document over the ceiling as a prompt to re-run the deletion test on every
 section, not as a licence to cut something that passed it.
 
-**Compression, not omission.** The 20 core sections are the spine in both cases. In a feature
-prompt several collapse to one or two sentences — the degenerate form is legitimate and informative
+**Compression, not omission.** The spine is the same in both cases: §1–§20 across Parts I–VI,
+then the tasks of Parte VII. In a feature plan several sections collapse to one or two sentences —
+the degenerate form is legitimate and informative
 ("a biblioteca não loga; logging é do consumidor"). What changes between a feature and an
 application is the size ceiling, not the section list.
 
@@ -59,7 +65,7 @@ application is the size ceiling, not the section list.
 ## Header block
 
 Always present, in this order. No YAML front-matter: the date and slug live in the filename, and
-the volatile status lives in the index table of `docs/prompts/README.md`. A `status:` field inside
+the volatile status lives in the index table of `docs/plans/README.md`. A `status:` field inside
 the file is a field nobody updates.
 
 ```md
@@ -164,7 +170,52 @@ In brownfield, fails if any path under §3.1 was not verified to exist by readin
 reuse list naming a package that is not there is the worst failure this document can produce: it
 sends the implementer looking for something that does not exist.
 
-#### 4. Estrutura e arquivos
+#### 4. Arquitetura do sistema
+
+**Precisa conter:** an ASCII box-drawing diagram in a fence showing the **runtime topology** — every
+process, service and store that runs, drawn *inside the boundary that hosts it* (host, container,
+network, device), each with the port or address it answers on, and arrows carrying the direction of
+traffic. Below it a `Componente | Papel | Onde roda` table that is the drawing's legend, and a
+bolded **Fronteiras invariáveis** naming the 2–4 arrows that may **never** exist.
+
+**Falha se:** the diagram draws layers instead of processes — "Frontend → Backend → Banco" is a
+truism, not this system's topology, and it fails the name-swap test. Also fails when a box in the
+drawing has no row in the legend, or when a component named elsewhere in the document is missing
+from the drawing.
+
+**Degenerate form, legitimate:** a single-process system draws its own box, the external
+dependencies it talks to, and the boundary it never crosses. Saying that is worth more than
+inflating it into three fictional tiers.
+
+**Boundary against §9.** This section shows *where things run*; §9 (`Motor de <o núcleo>`) explains
+*how the hard part works*. Restating the engine here is padding.
+
+**Destination.** The last task in Part VII converts this diagram into `<target>/ARCHITECTURE.md`
+(Mermaid) during implementation. Draw it to survive that translation: named nodes, explicit
+directions, no decoration.
+
+```
+┌─ <fronteira que hospeda: VPS, cluster, dispositivo> ───────────────┐
+│                                                                    │
+│  ┌──────────┐      ┌──────────┐      ┌─────────────────────────┐   │
+│  │ <proc A> │─────▶│ <proc B> │      │ <fronteira aninhada>    │   │
+│  │  :<port> │      │  :<port> │      │  ┌───────┐  ┌────────┐  │   │
+│  └──────────┘      └──────────┘      │  │ <svc> │  │<store> │  │   │
+│        │                             │  │ :<p>  │  │ :<p>   │  │   │
+│        │                             │  └───────┘  └────────┘  │   │
+│        │                             └─────────────────────────┘   │
+└────────┼───────────────────────────────────────────────────────────┘
+         │ <protocolo>
+         ▼
+   ┌─────────────┐
+   │ <cliente>   │
+   └─────────────┘
+```
+
+The skeleton above is **notation, not a system**: nested boundaries, one box per process, the port
+on the box, the protocol on the arrow. Replace every placeholder or delete the section.
+
+#### 5. Estrutura e arquivos
 
 **Precisa conter:** an ASCII tree in a fence, each node annotated with what it owns, and in
 brownfield each node marked `(NOVO — <por que existe>)` or `(EXISTENTE — <o que ganha>)`. Closes
@@ -173,7 +224,7 @@ with a bolded **Regra invariável** naming the 3–4 boundaries that may never b
 **Falha se:** the brownfield tree is unmarked. The marks are not annotation — they are the scope
 boundary, and an unmarked tree is unreviewable.
 
-#### 5. Modelo de dados
+#### 6. Modelo de dados
 
 **Precisa conter:** one sentence on the nature of the model and the deliberate difference from what
 the reader would assume (is it a cache? a source of truth? a queue?). Then `Entidade | Papel`, then
@@ -184,7 +235,7 @@ which existing entities are touched and what does **not** change shape.
 
 ### Parte II — Produto
 
-#### 6. Objetivo funcional
+#### 7. Objetivo funcional
 
 **Precisa conter:** a numbered list in the user's voice, verb first, ordered by priority, with the
 consequence the user perceives. This is the only place the product appears without technology.
@@ -192,11 +243,11 @@ consequence the user perceives. This is the only place the product appears witho
 **Falha se:** it names features instead of capabilities ("Módulo de biblioteca" instead of "Ver na
 web o que criou no desktop"). Without this section the document is a shopping list of stack.
 
-#### 7. Superfícies e fluxos
+#### 8. Superfícies e fluxos
 
 **Precisa conter:** the reference to the visual/design source if one exists; one bullet per surface
-(`**7.N Nome** — …`) shaped to the product type (screens, commands, routes, exported API); and a
-final **mandatory** sub-section `7.N Estados de exceção` listing no-network, expired session,
+(`**8.N Nome** — …`) shaped to the product type (screens, commands, routes, exported API); and a
+final **mandatory** sub-section `8.N Estados de exceção` listing no-network, expired session,
 missing resource, full disk, failed operation, conflict — each with a clear action, never a dead
 end. Where the product has list surfaces, a second sub-section for **estados vazios** — they are
 the screens a new user sees *first*, and treating them as absence of content rather than as screens
@@ -208,7 +259,7 @@ list. Also fails when a screen missing from the mocks is silently invented inste
 
 ### Parte III — Núcleo técnico
 
-#### 8. Motor de \<o núcleo\>
+#### 9. Motor de \<o núcleo\>
 
 **Precisa conter:** one sentence declaring the core architecture ("Uma interface, três
 implementações, escolhidas em runtime. Quem chama não sabe qual está ativa."), a table of modes when
@@ -218,12 +269,12 @@ including what happens on crash and on cancellation.
 **Falha se:** you could not name the crux. If the project has no genuinely hard part, say that
 explicitly — it is the most valuable finding in the document. Do not pad the section to hide it.
 
-#### 9. \<Decisão\> — ranking e escolha *(slot, 1..N)*
+#### 10. \<Decisão\> — ranking e escolha *(slot, 1..N)*
 
 See "The ranking pattern" below. **Floor: at least one ranking**, or an explicit sentence in §1
 stating why no decision in this project is disputed. **Ceiling: four.**
 
-#### 10. Segurança
+#### 11. Segurança
 
 **Precisa conter:** open with a bolded **A regra que rege o desenho** naming *this project's*
 dominant threat, concretely, with what an attacker gains if it is ignored. Every bullet below it
@@ -232,7 +283,7 @@ follows from that threat. At least one bullet is a negative, verified by a test.
 **Falha se:** it is a generic OWASP list with no named threat. Bullets that would appear unchanged
 in any other project are filler.
 
-#### 11. Contratos de fronteira
+#### 12. Contratos de fronteira
 
 **Precisa conter:** how the boundaries are organized (namespaces, route versioning); one line per
 contract (route, channel or command — who calls, what enters, what leaves, what is idempotent);
@@ -244,7 +295,7 @@ Also fails if it contains a function body — signature and behavior in prose, n
 
 ### Parte IV — Implementação
 
-#### 12. Fronteiras de estado e validação
+#### 13. Fronteiras de estado e validação
 
 **Precisa conter:** a table `Camada/Ferramenta | Responsabilidade` and a paragraph of **strict
 separation** naming who is the source of truth and who merely reflects it.
@@ -252,7 +303,7 @@ separation** naming who is the source of truth and who merely reflects it.
 **Falha se:** it restates the tools' own documentation. The content is *this project's* ownership
 boundaries, not what Zustand or Redis are for.
 
-#### 13. Padrões de código
+#### 14. Padrões de código
 
 **Precisa conter:** 2–4 sentences of writing rules, closing **mandatorily** with the list of this
 project's counterintuitive decisions that need a comment: "**Comentário explica o porquê**,
@@ -261,7 +312,7 @@ sobretudo: por que \<A\>, por que \<B\> e onde está o gatilho para deixar de se
 **Falha se:** it stops at the generic rules. This is a section generic by nature — the closing list
 is the only thing that saves it.
 
-#### 14. Engenharia, CI e workflow
+#### 15. Engenharia, CI e workflow
 
 **Precisa conter:** the repository's guides **that actually exist**, each with its scope; the
 **Regra de precedência** for conflicts between them; and what is specific to this target (runners,
@@ -273,7 +324,7 @@ commit format. That is a decision, not an omission.
 
 ### Parte V — Qualidade
 
-#### 15. Testes
+#### 16. Testes
 
 **Precisa conter:** the boundaries where being wrong is expensive, named specifically, one invariant
 each; the critical end-to-end flows; the central invariant that, if false, means the product is
@@ -282,7 +333,7 @@ wrong; and at least one **negative** ("GPU nunca é requisito de CI").
 **Falha se:** it says "escreva testes unitários e de integração". Without the negative, CI ends up
 carrying a requirement nobody can actually run.
 
-#### 16. Observabilidade
+#### 17. Observabilidade
 
 **Precisa conter:** structured logs and the identifier that correlates the two ends; where they go
 and how they rotate; 3–5 **named** metrics, including the one that reveals the real cost or failure
@@ -293,7 +344,7 @@ the degenerate form is real and correct: "a biblioteca não loga — logging é 
 
 ### Parte VI — Entrega
 
-#### 17. Escopo v1 vs Fase 2
+#### 18. Escopo v1 vs Fase 2
 
 **Precisa conter:** `**v1** — <lista corrida>` and `**Fase 2** — <o que fica de fora>`, including
 every conditional section you evaluated and discarded that the reader might otherwise think you
@@ -302,7 +353,7 @@ how Fase 2 fits without structural rework.
 
 **Falha se:** Fase 2 is empty. **If nothing was cut, there was no scope** — go back and cut.
 
-#### 18. Inventário de variáveis e segredos
+#### 19. Inventário de variáveis e segredos
 
 **Precisa conter:** what the system knows by configuration (`Variável | Uso | Quem cria`) and a
 bolded paragraph naming what is **never** embedded, with the test that verifies it.
@@ -311,22 +362,136 @@ bolded paragraph naming what is **never** embedded, with the test that verifies 
 anything distributed to a third party's machine. "Nenhuma variável — configuração por parâmetro" is
 itself a valid decision, stated.
 
-#### 19. Resultado esperado
+#### 20. Resultado esperado
 
-**Precisa conter:** a `- [ ]` checklist — the **only one** in the document — where every item is
-observable by a human and maps to a section.
+**Precisa conter:** a `- [ ]` checklist — the only one in Parts I–VI — where every item is
+observable by a human and maps to a section. The Parte VII tasks carry checkboxes too; nothing else
+does.
 
 **Falha se:** an item is not demonstrable. "App bem arquitetado" fails; "Geração local não debita
 créditos, coberto por teste ponta a ponta" passes.
 
-#### 20. Ordem de execução
+---
 
-**Precisa conter:** a numbered sequence whose **item 1 is not code** — an external dependency to
-close, a measurement to take, or the decision that must exist first. At least one item carries the
-honest cut ("Se \<a hipótese central\> se mostrar inviável, o corte honesto é \<a alternativa\>").
+### Parte VII — Tarefas de implementação
+
+The executable body of the plan. `/subagent-driven-development` reads **this** part: it extracts
+every task with its full text and dispatches one subagent per task, so a task that is not complete
+on the page is a task nobody can run.
+
+**Two rules invert here.** Fenced implementation code is **required** inside the step blocks, and
+`- [ ]` checkboxes are expected on every step. Both are banned in Parts I–VI; both are mandatory
+here.
+
+#### Preâmbulo — ordem de execução
+
+Opens Part VII. A numbered sequence, ordered by risk, whose **item 1 is not code** — an external
+dependency to close, a measurement to take, or the decision that must exist first. At least one
+item carries the honest cut ("Se \<a hipótese central\> se mostrar inviável, o corte honesto é
+\<a alternativa\>").
 
 **Falha se:** item 1 is "crie o projeto" or "instale as dependências". If the first step is
-scaffolding, the order was not thought about — the whole point is to front-load the risk.
+scaffolding, the order was not thought about — the whole point is to front-load the risk. Also
+fails if any task implements something from Fase 2 (§18), or rests on a question still listed under
+`Perguntas em aberto` — a task built on an unanswered question is rework with verification steps
+attached.
+
+#### Cabeçalho do plano
+
+Sits above the first task:
+
+```md
+> **Para agentes:** SUB-SKILL OBRIGATÓRIA — use `subagent-driven-development` para executar este
+> plano tarefa a tarefa. Os passos usam `- [ ]` para rastreamento.
+
+**Global Constraints** — <as exigências que valem para o projeto inteiro: pisos de versão, limites
+de dependência, regras de nomenclatura e de copy, requisitos de plataforma. Uma linha cada, com os
+valores exatos copiados das §2 e §15. Os requisitos de toda tarefa incluem esta seção.>
+```
+
+#### Right-sizing
+
+A task is the smallest unit that carries its own test cycle and is worth a fresh reviewer's gate.
+Fold setup, configuration, scaffolding and documentation into the task whose deliverable needs
+them; split only where a reviewer could meaningfully reject one task while approving its neighbour.
+Each task ends with an independently testable deliverable.
+
+Each **step** inside a task is one action of 2–5 minutes: write the failing test · run it and watch
+it fail · write the minimal implementation · run it and watch it pass · commit.
+
+#### Forma da tarefa
+
+```md
+### Tarefa N: <Componente>
+
+**Files:**
+- Create: `caminho/exato/do/arquivo.ts`
+- Modify: `caminho/exato/existente.ts:123-145`
+- Test: `tests/caminho/exato/arquivo.test.ts`
+
+**Interfaces:**
+- Consumes: <o que esta tarefa usa das anteriores — assinaturas exatas>
+- Produces: <o que as posteriores dependem — nomes de função, tipos de parâmetro e de retorno. Quem
+  implementa vê apenas a própria tarefa; este bloco é como ela aprende os nomes das vizinhas.>
+
+- [ ] **Passo 1: escreva o teste que falha** — <bloco de código com o teste real>
+- [ ] **Passo 2: rode e confirme a falha** — Run: `<comando exato>`; Expected: FAIL com "<mensagem>"
+- [ ] **Passo 3: implementação mínima** — <bloco de código com a implementação>
+- [ ] **Passo 4: rode e confirme que passa** — Run: `<comando exato>`; Expected: PASS
+- [ ] **Passo 5: commit** — <bloco com `git add` dos caminhos exatos e a mensagem de commit>
+```
+
+The `<bloco de código>` placeholders are literal blocks in the produced document, not prose about
+them. A step that describes what to do without showing how is not a step.
+
+#### Sem placeholders
+
+Every step carries the actual content the implementer needs. These are **plan failures** — never
+write them:
+
+- "TBD", "TODO", "implementar depois", "preencher os detalhes"
+- "adicione tratamento de erro adequado" / "adicione validação" / "trate os casos de borda"
+- "escreva os testes do acima", without the test code
+- "igual à Tarefa N" — repeat the code; the implementer may read tasks out of order
+- references to types, functions or methods defined in no task
+
+#### Última tarefa, obrigatória — `ARCHITECTURE.md`
+
+The final task creates `<target>/ARCHITECTURE.md` at the repository root, translating the §4 ASCII
+diagram into Mermaid. It is a *task*, not an output of this document: the file describes a system
+that does not exist until the tasks before it have run.
+
+```md
+# Arquitetura — <Nome do sistema>
+
+<Uma frase: o que o sistema é e qual invariante o desenho protege.>
+
+<bloco mermaid com a mesma topologia da §4 — mesmos nós, mesmas direções>
+
+## Componentes
+
+| Componente | Papel | Onde roda | Porta/Endereço |
+
+## Fluxos principais
+
+1. <caminho ponta a ponta, seguindo as setas do diagrama>
+
+## Fronteiras invariáveis
+
+- **<fronteira>** — <a seta que nunca existe, e o que quebra se ela existir>
+
+## O que este diagrama não mostra
+
+<o que ficou deliberadamente de fora, para o leitor não sair procurando>
+
+---
+**Origem:** `docs/plans/<arquivo>.md` §4 · **Revisão:** <data>
+**Atualize quando** entrar ou sair um processo, serviço, store ou dependência externa — não a cada
+feature.
+```
+
+**Falha se:** the Mermaid graph does not carry the same nodes and the same directions as §4. Two
+drawings of one topology that disagree are worse than one drawing.
 
 ---
 
@@ -498,8 +663,11 @@ These apply to every section, core and conditional. They are checked mechanicall
 
 ## Calibration example
 
-[example-drive-clone.md](example-drive-clone.md) is a full greenfield document produced by this
-template — a Google Drive clone, 30 sections, three ranking sections. **Do not read it by default:**
+[example-drive-clone.md](example-drive-clone.md) is a full greenfield document produced by an
+**earlier version** of this template — a Google Drive clone, 30 sections, three ranking sections.
+It predates §4 and Parte VII: it has no architecture diagram and no tasks, and its own numbering no
+longer mirrors the catalog above. Calibrate voice, rankings and honest cost against it; never
+calibrate structure. **Do not read it by default:**
 it is long, and the catalog above is the authority. Open it only when you need to calibrate one
 specific thing and the rule alone is not enough — what an honest cost actually sounds like, how a
 named antipattern closes a ranking, or how the exception-states sub-section reads when it is doing
