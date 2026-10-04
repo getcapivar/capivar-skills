@@ -92,9 +92,9 @@ adequado | apropriado | robusto | escalável | moderno | performático | conside
 
 ## Truth
 
-- [ ] **Zero `[SUPOSIÇÃO` markers survive.** Each became a §1 row, a plain statement, or an entry
-      under "Perguntas em aberto". A saved document full of assumption blocks is worse than one with
-      an honest open-questions list
+- [ ] **Every assumption A1…An was answered in the questionnaire, and none survives as a marker.**
+      Each became a §1 row, a plain statement, or an entry under "Perguntas em aberto". A saved
+      document full of assumption blocks is worse than one with an honest open-questions list
 - [ ] **Brownfield: every path under the "Reuso obrigatório" sub-section was verified to exist by
       reading the filesystem**, not recalled from a directory listing. A reuse list naming a package
       that is not there is the worst defect this document can carry — it sends the implementer
@@ -144,8 +144,8 @@ adequado | apropriado | robusto | escalável | moderno | performático | conside
       **no `ARCHITECTURE.md` at the repository root**: that file is the last task of the plan,
       not an output of this skill
 - [ ] **No file was written before the user approved the plan at GATE 2.** The only admissible
-      exception is `CONTEXT.md` / `docs/adr/`, and only when the grill was `grill-with-docs`. This
-      plan is the first file this skill created
+      exception is `CONTEXT.md` / `docs/adr/`, written by `domain-modeling` in the `grill-with-docs`
+      variant of the grill. This plan is the first file this skill created
 
 ---
 
