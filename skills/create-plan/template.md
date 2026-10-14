@@ -8,667 +8,315 @@ The document is written in **PT-BR** (or the target repo's documentation languag
 below are literal — copy them, accents included. The instructions around them are not part of the
 output.
 
-Every section entry has three lines, and the third does the most work:
-
-- **Inclua quando** — the observable trigger. Never "if it makes sense".
-- **Precisa conter** — the minimum that makes the section worth its space.
-- **Falha se** — the specific failure mode of *this* section. Read it before writing the section,
-  not after.
+Each entry says what the section **must contain**, its **line budget**, and how it **fails**. Read
+the failure before writing the section, not after.
 
 ---
 
-## Style rules
+## Size and style
 
-Every rule below was derived by measuring the reference document, not by taste.
+**Target: ~200 lines.** Feature in an existing repo 80–150 lines; new application 180–280;
+**ceiling 300**, counting the diagram and the tasks. A plan heading past 300 is two plans: GATE 2
+offers the split. The reader is an engineer — or an agent — who must hold the whole plan in mind
+at once; every line beyond that costs comprehension.
 
-| Rule | Evidence in the reference |
+**Scale each section to its complexity** (the `brainstorming` rule): one line when the answer is
+simple, up to the budget when it is nuanced, and YAGNI on everything else. A section that does not
+apply to this project stays, in **one line saying why** — "Não se aplica: a biblioteca não loga;
+logging é do consumidor." That line is informative; three paragraphs of nothing are not.
+
+| Rule | Why |
 |---|---|
-| Hard-wrap prose, bullets and blockquotes at 100 columns | 216 lines at 90–99 col; only 7 above 100 |
-| Table rows **never** wrap — one logical row, one physical line | table rows run to 187 columns |
-| `---` between every `##` section | 29 horizontal rules for 28 sections |
-| Emoji: **only** 🥇🥈🥉, **only** in ranking headings | 6 emoji in 716 lines |
-| `- [ ]` checklists only in Resultado esperado **and** in the Parte VII tasks | 12 checkboxes, 100% in one section, before Parte VII existed |
-| Parts I–VI: fenced blocks only for two-dimensional structure (architecture diagram, file tree, state machine) | 2 blocks in 716 lines, before §4 existed |
-| **Zero implementation code in Parts I–VI** — and code **required** in Parte VII | the decision sections must stay free to design; the tasks must be runnable |
-| Bold ~1 span per 20 words; backticks on every identifier, path, flag, package | 299 bold / 154 code spans |
-| Number every `##`; cross-reference always as `§N`, never "ver acima" | 24 uses |
-| Second person reserved for the honest-cost line — max 2 per document | 1 occurrence in 6,107 words |
-| At most one memorable maxim per hard section | two become rhetoric |
+| Hard-wrap prose and bullets at 100 columns; table rows never wrap | the file is reviewed as a diff |
+| Each section is `## N. Título`; no `---` between sections | separators cost lines and add nothing |
+| Cross-reference as `§N`, never "ver acima" | a pointer survives edits; "above" does not |
+| Tables over prose whenever there are rows | one row per fact is the densest readable form |
+| Fences only for the §4 diagram and, in an application, the §5 tree | anything else is prose or a table |
+| **Zero implementation code** — function signatures are fine | the implementer writes the code with TDD |
+| `- [ ]` only in §20 Resultado esperado | one checklist, one meaning |
+| Backticks on every identifier, path, flag and env var | names must be greppable |
 
-**Voice.** Imperative for instructions to the implementer ("Detecte antes de prometer", "Não faça").
-Impersonal present for facts ("O corpo do app é idêntico nas duas plataformas"). Avoid
-"deverá / será feito" — prefer imperative or present tense.
-
-**Size targets.** Full application 400–750 lines (ceiling 850). Feature in an existing repo 150–320
-lines (ceiling 400). Ordinary section 60–300 words, **ceiling 400** — no non-ranking section in the
-reference exceeds 305. Ranking section 350–750 words.
-
-**What the ceilings do not count.** The §4 diagram fence is excluded from both the word ceiling and
-the line ceiling — the prose around it gets its own budget of 150 words. **Parte VII is excluded
-from the line ceiling entirely:** it scales with the work to be done, not with how much there is to
-say. A plan whose tasks are long is not padded; a plan whose *sections* are long usually is.
-
-**The per-section ceiling is the one that bites.** The document-level number scales with how many
-sections the product genuinely earns — a 30-section application with three five-option rankings
-lands near 850 without a word of padding, and [example-drive-clone.md](example-drive-clone.md) is
-exactly that. Treat a document over the ceiling as a prompt to re-run the deletion test on every
-section, not as a licence to cut something that passed it.
-
-**Compression, not omission.** The spine is the same in both cases: §1–§20 across Parts I–VI,
-then the tasks of Parte VII. In a feature plan several sections collapse to one or two sentences —
-the degenerate form is legitimate and informative
-("a biblioteca não loga; logging é do consumidor"). What changes between a feature and an
-application is the size ceiling, not the section list.
+**Voice.** Imperative for instructions to the implementer ("Detecte antes de prometer", "Não
+faça"). Impersonal present for facts. Avoid "deverá / será feito".
 
 ---
 
 ## Header block
 
 Always present, in this order. No YAML front-matter: the date and slug live in the filename, and
-the volatile status lives in the index table of `docs/plans/README.md`. A `status:` field inside
-the file is a field nobody updates.
+the volatile status lives in the index table of `docs/plans/README.md`.
 
 ```md
-# Plano — <Nome> (<3–4 dimensões difíceis, não a stack>)
+# Plano — <Nome> (<2–3 dimensões difíceis, não a stack>)
 
-**Papel:** atue como <senioridade e especialidade>, com forte experiência em
-<especialização 1>, <especialização 2> e <especialização 3>.
-
-**Missão:** <verbo> o **`<caminho/do/entregável>`** — <o que é, para quem, em que plataforma> —
-cujo <invariante diferenciador em uma oração>.
-
-**Mentalidade de produção:** <a assimetria de falha DESTE projeto, em 2-4 frases: o que torna um
-erro aqui diferente de um erro em outro lugar>. Cada decisão de arquitetura precisa de razão
-explícita, cada fronteira precisa de contrato tipado, e cada caminho de falha precisa de um
-estado previsto.
+**Contexto:** <o problema, em uma frase>. <O que motivou o plano agora>. <O resultado esperado,
+observável>. <A assimetria de falha deste projeto: o que torna um erro aqui caro>.
 
 **Base:** leitura do repo em <data>, commit <sha curto>.
 ```
 
-Two rules that keep the header from dehydrating into decoration, both verifiable:
+`Contexto` fits in **2–4 lines**, and all four slots are filled. In greenfield there is no commit:
+`**Base:** projeto novo — não há repositório a ler; escrito em <data>.`
 
-- **Every specialization named in `Papel:` has a corresponding section in the body.** In the
-  reference, 5 of 5 map. The Papel is the index of the hard parts, not flavor text.
-- **Every sentence of `Mentalidade de produção:` is implemented by a section.** 3 of 3 in the
-  reference. If a sentence has no section, either write the section or delete the sentence.
+The title's parenthetical names the **hard dimensions**, not the stack: "(geração local e
+sincronização com a web)" — not "(Electron + React)". Every hard dimension in the title and every
+risk in `Contexto` is answered by a section in the body.
 
-The parenthetical qualifiers in the title are the **hard dimensions**, not the stack:
-"(Electron, geração local e sincronização com a web)" — not "(Electron + React)".
-
-### Nota de terminologia *(conditional)*
-
-**Inclua quando:** the original request used a wrong or ambiguous term, or one that collides with
-the target's `CONTEXT.md`.
-
-**Precisa conter:** what the term means here, what appeared in the request, and the consequence if
-the other reading was intended ("isso é escopo novo: outro modelo, outro custo — e exige documento
-próprio").
-
-**Falha se:** fabricated. Inventing a terminology note where there was no real slip is worse than
-omitting it. Also fails if the correction is made silently in the body — a silent correction hides
-a real misunderstanding from the person who made it.
-
-```md
-> **Nota de terminologia.** Este documento trata de **<termo correto>**. O termo "<termo do
-> pedido>" apareceu no pedido original e <foi confirmado como lapso / significa outra coisa aqui>.
-> Se a intenção for <a outra leitura>, isso é escopo novo: <o custo concreto> — e exige documento
-> próprio.
-```
-
-### Sumário *(conditional)*
-
-**Inclua quando:** the document has 15+ sections **or** 400+ lines.
-
-**Precisa conter:** the Parts, with sections separated by `·`, rankings in bold.
-
-**Falha se:** written before the body. **Generate it last, from the real headings.** Below the
-threshold it is pure maintenance cost — omit it.
+**Nota de terminologia** *(conditional — 2–4 lines, right after the header)*: only when the request
+used a wrong or ambiguous term, or one that collides with the target's `CONTEXT.md`. Say what the
+term means here, what the request said, and the cost if the other reading was intended. Never
+fabricated; never a silent correction in the body.
 
 ---
 
 ## Core sections
 
-Grouped in six Parts. A section is core when the **question** it answers exists in anything
-buildable; when the whole *subject* may not exist (upload, auth, i18n), it is conditional.
+A section is core when the **question** it answers exists in anything buildable. The Parts group
+the catalog; the document does not print them as headings.
 
 ### Parte I — Fundamentos
 
-#### 1. Decisões fechadas (não se rediscute; registre como ADR)
+**1. Decisões fechadas (não se rediscute; registre como ADR)** — *3–10 rows*
+Table `Decisão | Escolha | Razão curta`, holding every decision already made. The 1–3 that are hard
+to reverse go to §10 instead. **Fails if** a reason is circular or a virtue rather than a trade-off
+("é a melhor opção", "é o padrão do mercado", "é mais moderno"), or if a decision stated in the body
+is missing here. In brownfield, decisions already in ADRs or guides are cited, not reopened.
 
-**Precisa conter:** a table `Decisão | Escolha | Razão curta` holding every decision already made,
-here and nowhere else. Decisions that satisfy the five ranking criteria do NOT belong here — they
-become their own section.
+**2. Stack obrigatória** — *table of 3–8 rows + 1 line*
+Table `Camada | Tecnologia`, the cell carrying what matters (mode, flag, pin), then one line of
+**Política de versões**. **Fails if** it states a version not read from the manifest, Context7 or
+the registry — state the policy instead. In brownfield, say only what is **added**, or "nada além
+do que o repo já usa".
 
-**Falha se:** a "Razão curta" is circular ("usamos X porque X é bom"), or is a virtue rather than a
-trade-off. Banned reasons: "é a melhor opção", "é o padrão do mercado", "é mais moderno", "é o que
-todo mundo usa". Also fails if a decision stated in the body is missing from this table.
+**3. Reuso obrigatório e trabalho novo** — *2–8 lines*
+Brownfield: `Reuso` (real paths, what each covers), `Novo` (with `§N` pointers) and `Fallback` (an
+environment where a piece cannot run, and the stub that exercises the same contract). Greenfield:
+"Peças a construir" plus the fallback rule. **Fails if** greenfield lists anything as reused, or a
+reused path was not verified on disk — that sends the implementer looking for something that is not
+there.
 
-In brownfield, decisions already recorded in ADRs or guides are **cited, not reopened**.
-
-#### 2. Stack obrigatória
-
-**Precisa conter:** a table `Camada | Tecnologia`, where the technology cell carries the
-qualification that matters (mode, flag, exact pin). Then a **Política de versões** paragraph naming
-each deliberate exception *with its reason*.
-
-**Falha se:** it lists version numbers that were not read from the manifest, Context7 or the
-registry. A hallucinated version is worse than no version — it gets pinned into a manifest and
-breaks the build on install. State policy, not numbers, when unverified.
-
-In brownfield, say what is **added**; if nothing is added, write that — "nada além do que o repo já
-usa" is a negative constraint, and it only exists if written.
-
-#### 3. Reuso obrigatório e trabalho novo
-
-**Precisa conter:** `3.1 Reuso obrigatório (não reescrever)` with real paths and what each piece
-covers; `3.2 Novo` with cross-references; `3.3 Regra de fallback` naming a concrete environment
-where a piece cannot run (CI without GPU, sandbox without network) and the stub that exercises the
-same contract.
-
-**Falha se:** greenfield and §3.1 exists at all — a reuse list in a greenfield document is fiction.
-In brownfield, fails if any path under §3.1 was not verified to exist by reading the filesystem. A
-reuse list naming a package that is not there is the worst failure this document can produce: it
-sends the implementer looking for something that does not exist.
-
-#### 4. Arquitetura do sistema
-
-**Precisa conter:** an ASCII box-drawing diagram in a fence showing the **runtime topology** — every
-process, service and store that runs, drawn *inside the boundary that hosts it* (host, container,
-network, device), each with the port or address it answers on, and arrows carrying the direction of
-traffic. Below it a `Componente | Papel | Onde roda` table that is the drawing's legend, and a
-bolded **Fronteiras invariáveis** naming the 2–4 arrows that may **never** exist.
-
-**Falha se:** the diagram draws layers instead of processes — "Frontend → Backend → Banco" is a
-truism, not this system's topology, and it fails the name-swap test. Also fails when a box in the
-drawing has no row in the legend, or when a component named elsewhere in the document is missing
-from the drawing.
-
-**Degenerate form, legitimate:** a single-process system draws its own box, the external
-dependencies it talks to, and the boundary it never crosses. Saying that is worth more than
-inflating it into three fictional tiers.
-
-**Boundary against §9.** This section shows *where things run*; §9 (`Motor de <o núcleo>`) explains
-*how the hard part works*. Restating the engine here is padding.
-
-**Destination.** The last task in Part VII converts this diagram into `<target>/ARCHITECTURE.md`
-(Mermaid) during implementation. Draw it to survive that translation: named nodes, explicit
-directions, no decoration.
+**4. Arquitetura do sistema** — *feature up to ~15 lines; application up to ~35*
+An ASCII box-drawing diagram of the **runtime topology** — each process, service and store drawn
+inside the boundary that hosts it (host, container, network, device), with its port or address, and
+arrows for the direction of traffic. Below it, `Componente | Papel | Onde roda` as the legend, and
+one line of **Fronteiras invariáveis**: the 2–4 arrows that may never exist. **Fails if** it draws
+layers instead of processes ("Frontend → Backend → Banco" is not a topology), or a box has no legend
+row. A single-process system draws one box, its external dependencies and the boundary it never
+crosses. This section shows *where things run*; §9 explains *how the hard part works*. The last task
+turns it into `ARCHITECTURE.md` (Mermaid), so name the nodes and give the arrows a direction.
 
 ```
-┌─ <fronteira que hospeda: VPS, cluster, dispositivo> ───────────────┐
-│                                                                    │
-│  ┌──────────┐      ┌──────────┐      ┌─────────────────────────┐   │
-│  │ <proc A> │─────▶│ <proc B> │      │ <fronteira aninhada>    │   │
-│  │  :<port> │      │  :<port> │      │  ┌───────┐  ┌────────┐  │   │
-│  └──────────┘      └──────────┘      │  │ <svc> │  │<store> │  │   │
-│        │                             │  │ :<p>  │  │ :<p>   │  │   │
-│        │                             │  └───────┘  └────────┘  │   │
-│        │                             └─────────────────────────┘   │
-└────────┼───────────────────────────────────────────────────────────┘
-         │ <protocolo>
-         ▼
-   ┌─────────────┐
-   │ <cliente>   │
-   └─────────────┘
+┌─ <fronteira: VPS, cluster, dispositivo> ───────────────────┐
+│  ┌──────────┐      ┌──────────┐     ┌────────────────────┐ │
+│  │ <proc A> │─────▶│ <proc B> │     │ <fronteira interna>│ │
+│  │  :<port> │      │  :<port> │     │  ┌──────┐ ┌──────┐ │ │
+│  └──────────┘      └──────────┘     │  │<svc> │ │<store│ │ │
+│       │                             │  └──────┘ └──────┘ │ │
+└───────┼─────────────────────────────┴────────────────────┴─┘
+        │ <protocolo>
+        ▼
+  ┌───────────┐
+  │ <cliente> │
+  └───────────┘
 ```
 
-The skeleton above is **notation, not a system**: nested boundaries, one box per process, the port
-on the box, the protocol on the arrow. Replace every placeholder or delete the section.
+Notation, not a system: replace every placeholder or the section fails.
 
-#### 5. Estrutura e arquivos
+**5. Estrutura e arquivos** — *feature: up to 8 lines; application: tree of up to 15 lines*
+A feature lists the paths it creates or touches, each with what it owns. An application gets an
+ASCII tree in a fence. In brownfield, mark each node `(NOVO)` or `(EXISTENTE)`. Always close with
+one line of **Regra invariável** naming the boundaries that may never be crossed. **Fails if** a
+brownfield entry is unmarked — the marks are the scope boundary.
 
-**Precisa conter:** an ASCII tree in a fence, each node annotated with what it owns, and in
-brownfield each node marked `(NOVO — <por que existe>)` or `(EXISTENTE — <o que ganha>)`. Closes
-with a bolded **Regra invariável** naming the 3–4 boundaries that may never be crossed.
-
-**Falha se:** the brownfield tree is unmarked. The marks are not annotation — they are the scope
-boundary, and an unmarked tree is unreviewable.
-
-#### 6. Modelo de dados
-
-**Precisa conter:** one sentence on the nature of the model and the deliberate difference from what
-the reader would assume (is it a cache? a source of truth? a queue?). Then `Entidade | Papel`, then
-**Regras de integridade** as bullets, each with the concrete consequence of violating it.
-
-**Falha se:** there is no new persistent state and the section is padded anyway. Say so, and say
-which existing entities are touched and what does **not** change shape.
+**6. Modelo de dados** — *1–6 lines*
+One sentence on the nature of the model (cache? source of truth? queue?), the entities and their
+role, and the integrity rules with the consequence of breaking each. **Fails if** it pads when
+there is no new persistent state — then say which existing entities are touched and that none
+changes shape.
 
 ### Parte II — Produto
 
-#### 7. Objetivo funcional
+**7. Objetivo funcional** — *3–6 numbered lines*
+What the user can do, in their voice, verb first, ordered by priority. **Fails if** it names
+features ("módulo de biblioteca") instead of capabilities ("ver na web o que criou no desktop").
 
-**Precisa conter:** a numbered list in the user's voice, verb first, ordered by priority, with the
-consequence the user perceives. This is the only place the product appears without technology.
-
-**Falha se:** it names features instead of capabilities ("Módulo de biblioteca" instead of "Ver na
-web o que criou no desktop"). Without this section the document is a shopping list of stack.
-
-#### 8. Superfícies e fluxos
-
-**Precisa conter:** the reference to the visual/design source if one exists; one bullet per surface
-(`**8.N Nome** — …`) shaped to the product type (screens, commands, routes, exported API); and a
-final **mandatory** sub-section `8.N Estados de exceção` listing no-network, expired session,
-missing resource, full disk, failed operation, conflict — each with a clear action, never a dead
-end. Where the product has list surfaces, a second sub-section for **estados vazios** — they are
-the screens a new user sees *first*, and treating them as absence of content rather than as screens
-is what makes a product look broken in its first minute.
-
-**Falha se:** the exception sub-section is absent. A surface without its exception states is a wish
-list. Also fails when a screen missing from the mocks is silently invented instead of marked:
-"**Não existe nos mocks**: desenhe no vocabulário do DS e registre em `docs/design/…`".
+**8. Superfícies e fluxos** — *2–8 lines*
+One `**8.N Nome** — …` entry per screen, command, route or exported API (short entries may share a
+line, joined by `·`), then **Estados de exceção** (no network, expired session, missing resource,
+failed operation, conflict — each with its action, and every error code of §12 covered) and, where
+there are lists, one of **estados vazios**. **Fails if** the exceptions are missing, or a screen
+absent from the mocks is invented instead of marked "**Não existe nos mocks**".
 
 ### Parte III — Núcleo técnico
 
-#### 9. Motor de \<o núcleo\>
+**9. Motor de \<o núcleo\>** — *2–6 lines*
+One sentence declaring the core architecture, then the invariants, each with the cost of breaking
+it, including crash and cancellation. **Fails if** you cannot name the crux. If the project has no
+hard part, say so in one line — that is the most valuable finding in the document.
 
-**Precisa conter:** one sentence declaring the core architecture ("Uma interface, três
-implementações, escolhidas em runtime. Quem chama não sabe qual está ativa."), a table of modes when
-there is more than one path, and bullets of invariants — each with the cost of violating it,
-including what happens on crash and on cancellation.
+**10. Decisões difíceis de reverter** — *table of 1–3 rows*
+Table `Decisão | Escolha | Descartada | Custo | Migrar quando`. A decision belongs here only when
+all five hold: changing it means rewriting a subsystem; there are 3+ real alternatives; the winner
+charges a price; the reader will question it; and a future condition would reverse it. **Fails
+if** the cost is empty, the discarded option is a strawman, or the trigger is not observable
+("quando ficar grande"). At least one trigger in the document is numeric ("passar de ~500 linhas",
+"a segunda classe de bug de ordering"). With no disputed decision, one line saying why.
 
-**Falha se:** you could not name the crux. If the project has no genuinely hard part, say that
-explicitly — it is the most valuable finding in the document. Do not pad the section to hide it.
+**11. Segurança** — *2–5 lines*
+Opens with **A regra que rege o desenho**: this project's dominant threat and what an attacker gains
+if it is ignored. Every line below follows from it; at least one is a negative, verified by a test.
+**Fails if** it is a generic OWASP list.
 
-#### 10. \<Decisão\> — ranking e escolha *(slot, 1..N)*
-
-See "The ranking pattern" below. **Floor: at least one ranking**, or an explicit sentence in §1
-stating why no decision in this project is disputed. **Ceiling: four.**
-
-#### 11. Segurança
-
-**Precisa conter:** open with a bolded **A regra que rege o desenho** naming *this project's*
-dominant threat, concretely, with what an attacker gains if it is ignored. Every bullet below it
-follows from that threat. At least one bullet is a negative, verified by a test.
-
-**Falha se:** it is a generic OWASP list with no named threat. Bullets that would appear unchanged
-in any other project are filler.
-
-#### 12. Contratos de fronteira
-
-**Precisa conter:** how the boundaries are organized (namespaces, route versioning); one line per
-contract (route, channel or command — who calls, what enters, what leaves, what is idempotent);
-where the types come from, single-sourced; the error envelope with a **closed set** of codes; and
-what never crosses this boundary directly.
-
-**Falha se:** the error code set is open-ended, or a second vocabulary of codes is allowed to exist.
-Also fails if it contains a function body — signature and behavior in prose, never implementation.
+**12. Contratos de fronteira** — *2–10 lines*
+One line per contract (route, channel or command — who calls, what enters, what leaves, what is
+idempotent), where the types come from, and the error envelope with a **closed set** of codes.
+**Fails if** the code set is open-ended or a body appears — signature and behaviour in prose only.
 
 ### Parte IV — Implementação
 
-#### 13. Fronteiras de estado e validação
+**13. Fronteiras de estado e validação** — *1–4 lines*
+Who is the source of truth and who merely reflects it, per layer. **Fails if** it restates what the
+tools do instead of this project's ownership.
 
-**Precisa conter:** a table `Camada/Ferramenta | Responsabilidade` and a paragraph of **strict
-separation** naming who is the source of truth and who merely reflects it.
+**14. Padrões de código** — *1–4 lines*
+Only this project's counterintuitive decisions that need a comment: "por que \<A\>, por que \<B\>
+e onde está o gatilho para deixar de ser". **Fails if** it lists generic rules.
 
-**Falha se:** it restates the tools' own documentation. The content is *this project's* ownership
-boundaries, not what Zustand or Redis are for.
-
-#### 14. Padrões de código
-
-**Precisa conter:** 2–4 sentences of writing rules, closing **mandatorily** with the list of this
-project's counterintuitive decisions that need a comment: "**Comentário explica o porquê**,
-sobretudo: por que \<A\>, por que \<B\> e onde está o gatilho para deixar de ser".
-
-**Falha se:** it stops at the generic rules. This is a section generic by nature — the closing list
-is the only thing that saves it.
-
-#### 15. Engenharia, CI e workflow
-
-**Precisa conter:** the repository's guides **that actually exist**, each with its scope; the
-**Regra de precedência** for conflicts between them; and what is specific to this target (runners,
-cache, artifacts, signing, platform matrix).
-
-**Falha se:** it cites guides that do not exist in the target repo, or reproduces their content
-instead of pointing at them. When there are no guides, declare the minimum — CI gate, branch policy,
-commit format. That is a decision, not an omission.
+**15. Engenharia, CI e workflow** — *1–4 lines*
+The repo's guides that actually exist, with the precedence between them, plus what is specific to
+this target (runners, artefacts, signing, platform matrix). With no guides: the minimum — CI gate,
+branch policy, commit format. **Fails if** it cites a guide that does not exist.
 
 ### Parte V — Qualidade
 
-#### 16. Testes
+**16. Testes** — *2–6 lines*
+The boundaries where being wrong is expensive, the critical end-to-end flows, the central invariant,
+and at least one **negative** ("GPU nunca é requisito de CI"). **Fails if** it says "escreva testes
+unitários e de integração".
 
-**Precisa conter:** the boundaries where being wrong is expensive, named specifically, one invariant
-each; the critical end-to-end flows; the central invariant that, if false, means the product is
-wrong; and at least one **negative** ("GPU nunca é requisito de CI").
-
-**Falha se:** it says "escreva testes unitários e de integração". Without the negative, CI ends up
-carrying a requirement nobody can actually run.
-
-#### 17. Observabilidade
-
-**Precisa conter:** structured logs and the identifier that correlates the two ends; where they go
-and how they rotate; 3–5 **named** metrics, including the one that reveals the real cost or failure
-driver; and the exportable diagnostic.
-
-**Falha se:** the metrics are categories ("métricas de performance") instead of names. For a library
-the degenerate form is real and correct: "a biblioteca não loga — logging é do consumidor".
+**17. Observabilidade** — *1–4 lines*
+Structured logs and the identifier that correlates both ends; 3–5 **named** metrics, including the
+one that reveals the real cost or failure driver; and one **negative** — what is never logged (file
+contents, tokens). **Fails if** metrics are categories. A library answers in one line: "não loga —
+logging é do consumidor".
 
 ### Parte VI — Entrega
 
-#### 18. Escopo v1 vs Fase 2
+**18. Escopo v1 vs Fase 2** — *2–4 lines*
+`**v1** — <lista corrida>` and `**Fase 2** — <o que fica de fora>`, including the conditional
+sections evaluated and discarded that a reader might think were forgotten, and — when the grill
+left any — one line of **Perguntas em aberto**. **Fails if** Fase 2 is empty — if nothing was cut,
+there was no scope.
 
-**Precisa conter:** `**v1** — <lista corrida>` and `**Fase 2** — <o que fica de fora>`, including
-every conditional section you evaluated and discarded that the reader might otherwise think you
-forgot, plus the migrations whose triggers live in the ranking sections. Close with one sentence on
-how Fase 2 fits without structural rework.
+**19. Inventário de variáveis e segredos** — *table of up to 6 rows + 1 line*
+`Variável | Uso | Quem cria`, then one bold line naming what is **never** embedded and the test
+that proves it. **Fails if** any secret appears with a value. "Nenhuma variável" is a valid answer,
+stated.
 
-**Falha se:** Fase 2 is empty. **If nothing was cut, there was no scope** — go back and cut.
+**20. Resultado esperado** — *3–8 checkboxes*
+A `- [ ]` checklist, each item observable by a human and pointing at a section. **Fails if** an item
+is not demonstrable ("app bem arquitetado" fails; "geração local não debita créditos, coberto por
+teste ponta a ponta" passes).
 
-#### 19. Inventário de variáveis e segredos
+### Parte VII — Tarefas
 
-**Precisa conter:** what the system knows by configuration (`Variável | Uso | Quem cria`) and a
-bolded paragraph naming what is **never** embedded, with the test that verifies it.
+Printed in the document as `## Tarefas`, unnumbered, after §20. `/subagent-driven-development`
+reads **this** part: it hands each task's full text to an implementer subagent that sees nothing
+else and writes the code test-first. So a task carries **what** and **how to know it is done** —
+never the code.
 
-**Falha se:** any secret appears with a value. Also fails if the "nunca embarcado" list is empty for
-anything distributed to a third party's machine. "Nenhuma variável — configuração por parâmetro" is
-itself a valid decision, stated.
+**Opens with the order of execution** — *3–6 numbered lines*, ordered by risk. **Item 1 is not
+code**: an external dependency to close, a measurement to take, or a spike that tests the central
+hypothesis — never a decision still open, which belongs in §18 `Perguntas em aberto`. At least one
+item carries the honest cut ("se \<a hipótese central\> se mostrar inviável, o
+corte honesto é \<a alternativa\>"). **Fails if** item 1 is "crie o projeto" or "instale as
+dependências".
 
-#### 20. Resultado esperado
-
-**Precisa conter:** a `- [ ]` checklist — the only one in Parts I–VI — where every item is
-observable by a human and maps to a section. The Parte VII tasks carry checkboxes too; nothing else
-does.
-
-**Falha se:** an item is not demonstrable. "App bem arquitetado" fails; "Geração local não debita
-créditos, coberto por teste ponta a ponta" passes.
-
----
-
-### Parte VII — Tarefas de implementação
-
-The executable body of the plan. `/subagent-driven-development` reads **this** part: it extracts
-every task with its full text and dispatches one subagent per task, so a task that is not complete
-on the page is a task nobody can run.
-
-**Two rules invert here.** Fenced implementation code is **required** inside the step blocks, and
-`- [ ]` checkboxes are expected on every step. Both are banned in Parts I–VI; both are mandatory
-here.
-
-#### Preâmbulo — ordem de execução
-
-Opens Part VII. A numbered sequence, ordered by risk, whose **item 1 is not code** — an external
-dependency to close, a measurement to take, or the decision that must exist first. At least one
-item carries the honest cut ("Se \<a hipótese central\> se mostrar inviável, o corte honesto é
-\<a alternativa\>").
-
-**Falha se:** item 1 is "crie o projeto" or "instale as dependências". If the first step is
-scaffolding, the order was not thought about — the whole point is to front-load the risk. Also
-fails if any task implements something from Fase 2 (§18), or rests on a question still listed under
-`Perguntas em aberto` — a task built on an unanswered question is rework with verification steps
-attached.
-
-#### Cabeçalho do plano
-
-Sits above the first task:
+**Then the tasks** — *4–6 lines each, heading not counted*. A task is the smallest unit with its own
+test cycle that a reviewer could reject on its own; fold setup and config into the task that needs
+them.
 
 ```md
-> **Para agentes:** SUB-SKILL OBRIGATÓRIA — use `subagent-driven-development` para executar este
-> plano tarefa a tarefa. Os passos usam `- [ ]` para rastreamento.
-
-**Global Constraints** — <as exigências que valem para o projeto inteiro: pisos de versão, limites
-de dependência, regras de nomenclatura e de copy, requisitos de plataforma. Uma linha cada, com os
-valores exatos copiados das §2 e §15. Os requisitos de toda tarefa incluem esta seção.>
+### T<N> — <verbo + resultado>
+Arquivos: <criar/modificar, caminhos exatos>
+Interface: <assinaturas que outras tarefas consomem ou produzem>
+Teste: <o que o teste prova, incluindo um caso negativo — escrito antes do código>
+Pronto quando: <critério observável>
 ```
 
-#### Right-sizing
+**Fails if** a path is not exact (no globs, no "testes ao lado"); a task has no negative test case,
+implements something from Fase 2 or rests on a question still under `Perguntas em aberto`; uses a
+name not defined by that task or an earlier one; says "igual à T\<N\>" (the implementer reads tasks
+out of order); or contains TBD.
 
-A task is the smallest unit that carries its own test cycle and is worth a fresh reviewer's gate.
-Fold setup, configuration, scaffolding and documentation into the task whose deliverable needs
-them; split only where a reviewer could meaningfully reject one task while approving its neighbour.
-Each task ends with an independently testable deliverable.
-
-Each **step** inside a task is one action of 2–5 minutes: write the failing test · run it and watch
-it fail · write the minimal implementation · run it and watch it pass · commit.
-
-#### Forma da tarefa
-
-```md
-### Tarefa N: <Componente>
-
-**Files:**
-- Create: `caminho/exato/do/arquivo.ts`
-- Modify: `caminho/exato/existente.ts:123-145`
-- Test: `tests/caminho/exato/arquivo.test.ts`
-
-**Interfaces:**
-- Consumes: <o que esta tarefa usa das anteriores — assinaturas exatas>
-- Produces: <o que as posteriores dependem — nomes de função, tipos de parâmetro e de retorno. Quem
-  implementa vê apenas a própria tarefa; este bloco é como ela aprende os nomes das vizinhas.>
-
-- [ ] **Passo 1: escreva o teste que falha** — <bloco de código com o teste real>
-- [ ] **Passo 2: rode e confirme a falha** — Run: `<comando exato>`; Expected: FAIL com "<mensagem>"
-- [ ] **Passo 3: implementação mínima** — <bloco de código com a implementação>
-- [ ] **Passo 4: rode e confirme que passa** — Run: `<comando exato>`; Expected: PASS
-- [ ] **Passo 5: commit** — <bloco com `git add` dos caminhos exatos e a mensagem de commit>
-```
-
-The `<bloco de código>` placeholders are literal blocks in the produced document, not prose about
-them. A step that describes what to do without showing how is not a step.
-
-#### Sem placeholders
-
-Every step carries the actual content the implementer needs. These are **plan failures** — never
-write them:
-
-- "TBD", "TODO", "implementar depois", "preencher os detalhes"
-- "adicione tratamento de erro adequado" / "adicione validação" / "trate os casos de borda"
-- "escreva os testes do acima", without the test code
-- "igual à Tarefa N" — repeat the code; the implementer may read tasks out of order
-- references to types, functions or methods defined in no task
-
-#### Última tarefa, obrigatória — `ARCHITECTURE.md`
-
-The final task creates `<target>/ARCHITECTURE.md` at the repository root, translating the §4 ASCII
-diagram into Mermaid. It is a *task*, not an output of this document: the file describes a system
-that does not exist until the tasks before it have run.
-
-```md
-# Arquitetura — <Nome do sistema>
-
-<Uma frase: o que o sistema é e qual invariante o desenho protege.>
-
-<bloco mermaid com a mesma topologia da §4 — mesmos nós, mesmas direções>
-
-## Componentes
-
-| Componente | Papel | Onde roda | Porta/Endereço |
-
-## Fluxos principais
-
-1. <caminho ponta a ponta, seguindo as setas do diagrama>
-
-## Fronteiras invariáveis
-
-- **<fronteira>** — <a seta que nunca existe, e o que quebra se ela existir>
-
-## O que este diagrama não mostra
-
-<o que ficou deliberadamente de fora, para o leitor não sair procurando>
-
----
-**Origem:** `docs/plans/<arquivo>.md` §4 · **Revisão:** <data>
-**Atualize quando** entrar ou sair um processo, serviço, store ou dependência externa — não a cada
-feature.
-```
-
-**Falha se:** the Mermaid graph does not carry the same nodes and the same directions as §4. Two
-drawings of one topology that disagree are worse than one drawing.
-
----
-
-## The ranking pattern
-
-A decision **rises to a ranking section** only when **all five** are true:
-
-1. **Low reversibility** — changing your mind means rewriting a subsystem, not a function.
-2. **Three or more real alternatives** a competent engineer would genuinely propose. Not strawmen.
-3. **The winner charges a price.** If it is free, it is a fact — it goes in the §1 table.
-4. **The reader will question it** — the popular option was rejected, or the choice is unusual here.
-5. **A future condition would reverse it.** If nothing would change your mind, it is a table row.
-
-With six candidates, promote the three most expensive to reverse and demote the rest to §1 rows
-with a "Razão curta".
-
-### Gabarito
-
-```md
-## N. <Decisão em uma frase> — ranking e escolha
-
-<Uma frase listando os critérios de julgamento, cada um em negrito.>
-
-**Como é <o problema> aqui**
-
-- **<Característica real, com número>:** <…>
-- **<O que torna este caso diferente do caso de manual>:** <…>
-- **<O que já existe e pesa a favor de alguma opção>:** <…>
-
-### 🥇 1º — <Opção> — **ESCOLHA**
-
-- **<Vantagem>:** <mecanismo, não adjetivo>.
-- **Requisito que falta hoje:** <trabalho prévio que a escolha exige>.
-- **Custo honesto:** <o que se paga por escolher isto>. <Por que é aceitável aqui.>
-- **Configuração obrigatória:** <parâmetros sem os quais a escolha não vale>.
-
-### 🥈 2º — <Opção>
-
-<Por que é forte e a razão exata de ficar em 2º.> **Contra:** <…>
-
-### 🥉 3º — <Opção>
-
-<Idem. Se tiver uso legítimo em outro papel, diga qual — e onde nunca usar.>
-
-### 4º — <Opção>
-
-<…> **Contra:** <…> **Reconsiderar** se <condição observável>.
-
-### 5º — <Antipadrão>
-
-Antipadrão. <O que quebra concretamente, com o cenário.> Não faça.
-
-### Decisão e gatilho de migração
-
-**v1: <escolha>.** Mas **isole a fronteira**: <onde o código vive, atrás de qual interface, em
-qual pacote>. Nenhuma outra parte do sistema sabe **como** isso acontece.
-
-**Migre para <2º colocado> quando qualquer um destes for verdade** — e registre como ADR:
-
-1. <gatilho de requisito, observável>
-2. <gatilho de produto, observável>
-3. <gatilho quantitativo — "passar de ~N linhas", "a segunda classe de bug de X">
-4. <gatilho de escopo — "entrar uma terceira superfície">
-
-<Uma frase: por que a fronteira existe — a troca deve custar reescrever `<dir>/`, e nada além.>
-```
-
-### Invariants — violating these dissolves the pattern
-
-- Medals only on 1º, 2º, 3º. From 4º on, plain ordinals. **No other emoji anywhere in the
-  document.**
-- `**ESCOLHA**` bolded in the winner's heading (`**ESCOLHA PARA O v1**` when it is temporary).
-- **`Custo honesto:` appears exactly once, on the winner.** Losers carry `Contra:`. The document
-  charges the price of the choice it makes — rejecting is easy. A winner with no cost did not
-  deserve a ranking.
-- The runner-up is a genuine near-miss ("praticamente empatado, e melhor se a equipe preferir SQL
-  explícito"), never a strawman. **If you cannot name a condition under which the runner-up wins,
-  you have not understood the trade-off.** Go back and read.
-- The last position is reserved for the antipattern, when one exists, closing on "Não faça."
-- At least one migration trigger is **quantitative**. "Quando ficar grande" is banned; "quando o
-  código próprio passar de ~500 linhas ou acumular a segunda classe de bug de ordering" is accepted.
-- **Lean variant:** when no migration is foreseeable, replace the closing sub-section with a single
-  line — `**Decisão:** X para <caso A>; Y para <caso B>.`
-
-### Sibling pattern — the named dismissal
-
-Use when the reader *expects* a family of tools you are not going to adopt.
-
-```md
-### N.M Sobre <família de ferramentas>
-
-Essas ferramentas resolvem **<o problema real delas>**. <Este projeto> tem **<a diferença
-factual>**. **Adotá-las aqui seria <o custo concreto>.** O que se aproveita é a *ideia* —
-<qual> — e é ela que a §N.1 aplica.
-
-**Reavaliar** se <condição observável que torna o problema deles o nosso>.
-```
+**The last task is always `ARCHITECTURE.md`.** It creates `<target>/ARCHITECTURE.md` from §4: the
+same nodes and directions in a Mermaid block, the component table, the main flows, the invariant
+boundaries, what the diagram leaves out, and the line "Atualize quando entrar ou sair um processo,
+serviço, store ou dependência externa — não a cada feature". It is a task, not an output of the
+plan: the file describes a system that only exists once the tasks before it have run.
 
 ---
 
 ## Conditional section library
 
-Walk this table answering yes/no to every trigger **before writing**. Every conditional you
-evaluated and discarded that a reader might miss (i18n, payments, real-time) becomes a line in
-Fase 2 — silent omission reads as forgetting.
+Walk this table answering yes/no to every trigger **before writing**. A conditional section is
+numbered after §20 (§21, §22…) and gets **1–6 lines**. A triggered conditional whose content fits
+in 1–2 lines of a core section may be **folded** there instead — name the target section in the
+GATE 1 map. Every one you discarded that a reader might miss (i18n, payments, real-time) becomes a
+word in Fase 2 — silent omission reads as forgetting.
 
-| Parte | Section | Inclua quando | Falha se |
-|---|---|---|---|
-| II | Fidelidade visual e design system | há mock/Figma/produto de referência, ou um DS a respeitar | não diz o que **não** copiar, nem o que no mock é ilustração e não componente |
-| II | Componentização | a superfície tem 3+ vistas que compartilham elementos | não nomeia as vistas que usam *o mesmo* componente (regra anti-duplicação) |
-| II | Superfície de linha de comando | o produto é invocado por terminal | omite códigos de saída, stdout vs stderr, e comportamento sob pipe |
-| III | Motor de upload e armazenamento | recebe bytes do usuário ou persiste artefatos binários | não diz o esquema da chave, a validade da URL assinada, e o que nunca passa pelo banco |
-| III | Autenticação e sessão | existe identidade (login, token, chave de API) ou dado por usuário | não diz **onde a autorização é revalidada** — a borda nunca é fronteira de autorização |
-| III | Autorização e multi-tenancy | dois usuários/orgs veem dados diferentes na mesma instância | falta o teste de vazamento cross-tenant no CI |
-| III | Trabalho assíncrono: fila e workers | operação acima de ~1s, fora do request, ou que precisa de retry | omite idempotência por chave, DLQ, e a reconciliação de trabalho preso |
-| III | Tempo real | dois clientes veem a mudança sem recarregar, ou progresso sem polling | ignora fallback, reconexão e autorização do canal. **Costuma merecer ranking** |
-| III | Sincronização e offline | existe cópia local que pode divergir da remota | lista ferramentas antes de caracterizar o conflito real. **Quase sempre ranking** |
-| III | Integração com IA/LLM | o produto chama ou hospeda um modelo | omite licença de pesos, teto de custo, e quais dados do usuário nunca vão ao provedor |
-| III | Pagamentos e cobrança | dinheiro muda de mãos ou existe plano/limite pago | não nomeia a fonte de verdade (provedor via webhook) nem a idempotência do webhook |
-| III | Processo ou serviço externo gerenciado | o app sobe/baixa/gerencia binário ou runtime de terceiro | promete antes de detectar; sem verificação de hash; sem cancelamento real |
-| III | Migração de dados legados | dados existentes precisam existir no formato novo | sem volume real com número, sem reversibilidade, sem o destino do que não migra. **Normalmente ranking** |
-| III | Notificações e e-mail | o sistema fala com o usuário fora da sessão | sem opt-out, sem rate limit por destinatário, sem o que nunca é notificado |
-| III | Moderação e conteúdo público | usuários publicam conteúdo visível a terceiros | sem takedown auditado |
-| V | Performance | há caminho quente, limite de recurso, ou volume que cresce | usa adjetivo em vez de orçamento numérico ou invariante de não-bloqueio |
-| V | Acessibilidade | existe interface humana (GUI, TUI ou CLI) | não nomeia a operação longa que precisa de anúncio de status. CLI: esquece `NO_COLOR` e cor como único sinal |
-| V | Responsividade / adaptação de janela | viewport variável **ou** janela redimensionável | desktop: não valida a posição restaurada contra os monitores atuais |
-| V | i18n e localização | mais de um idioma, formatação por locale, ou conteúdo multilíngue | não diz o que **não** se traduz |
-| V | Custo operacional | o custo de rodar varia com o uso (GPU, tokens, egress, execuções) | não nomeia o driver real de custo nem o teto |
-| VI | Empacotamento e distribuição | instalado na máquina de terceiro (desktop, mobile, extensão, CLI publicada) | omite assinatura — sem ela o instalador é barrado, e isso é requisito de entrega, não polimento |
-| VI | Compatibilidade e versionamento público | alguém que você não deploya consome sua interface | sem política de quebra nem janela de depreciação |
-| VI | Rollout e feature flags | a mudança não pode atingir toda a base de uma vez | sem critério de avanço e sem critério de rollback |
+| Section | Inclua quando | Falha se |
+|---|---|---|
+| Fidelidade visual e design system | há mock/Figma/produto de referência, ou um DS a respeitar | não diz o que **não** copiar |
+| Componentização | a superfície tem 3+ vistas que compartilham elementos | não nomeia as vistas que usam o mesmo componente |
+| Superfície de linha de comando | o produto é invocado por terminal | omite códigos de saída, stdout vs stderr e comportamento sob pipe |
+| Upload e armazenamento | recebe bytes do usuário ou persiste binários | não diz o esquema da chave, a validade da URL assinada e o que nunca passa pelo banco |
+| Autenticação e sessão | existe identidade ou dado por usuário | não diz **onde a autorização é revalidada** |
+| Autorização e multi-tenancy | dois usuários/orgs veem dados diferentes na mesma instância | falta o teste de vazamento cross-tenant no CI |
+| Fila e workers | operação acima de ~1s, fora do request, ou com retry | omite idempotência por chave, DLQ e reconciliação de trabalho preso |
+| Tempo real | dois clientes veem a mudança sem recarregar | ignora fallback, reconexão e autorização do canal — costuma ir para a §10 |
+| Sincronização e offline | existe cópia local que pode divergir da remota | lista ferramentas antes de caracterizar o conflito — quase sempre vai para a §10 |
+| Integração com IA/LLM | o produto chama ou hospeda um modelo | omite teto de custo e quais dados do usuário nunca vão ao provedor |
+| Pagamentos e cobrança | dinheiro muda de mãos ou há plano pago | não nomeia a fonte de verdade nem a idempotência do webhook |
+| Processo externo gerenciado | o app sobe/baixa/gerencia binário de terceiro | promete antes de detectar; sem hash; sem cancelamento real |
+| Migração de dados legados | dados existentes precisam do formato novo | sem volume com número, sem reversão, sem destino do que não migra |
+| Notificações e e-mail | o sistema fala com o usuário fora da sessão | sem opt-out e sem rate limit por destinatário |
+| Moderação | usuários publicam conteúdo visível a terceiros | sem takedown auditado |
+| Performance | há caminho quente, limite de recurso ou volume que cresce | usa adjetivo em vez de orçamento numérico |
+| Acessibilidade | existe interface humana (GUI, TUI ou CLI) | não nomeia a operação longa que anuncia status; CLI esquece `NO_COLOR` |
+| Responsividade e janela | viewport variável ou janela redimensionável | desktop não valida a posição restaurada contra os monitores atuais |
+| i18n e localização | mais de um idioma ou formatação por locale | não diz o que **não** se traduz |
+| Custo operacional | o custo varia com o uso (GPU, tokens, egress) | não nomeia o driver de custo nem o teto |
+| Empacotamento e distribuição | instalado na máquina de terceiro | omite assinatura — sem ela o instalador é barrado |
+| Compatibilidade pública | alguém que você não deploya consome a interface | sem política de quebra nem janela de depreciação |
+| Rollout e feature flags | a mudança não pode atingir toda a base de uma vez | sem critério de avanço e de rollback |
 
 ---
 
 ## Anti-generic rules
 
-These apply to every section, core and conditional. They are checked mechanically by
-[review-checklist.md](review-checklist.md) before the file is saved.
+Checked by [review-checklist.md](review-checklist.md) before the file is presented.
 
-1. **Name-swap test.** Every section contains at least one claim that would be **false or
-   meaningless** in another project. If you swap the product name and the section still reads fine,
-   it is boilerplate — rewrite it or delete it.
-2. **Evidence provenance.** Every claim traces to exactly one of four sources: a file you read in
-   the target repo (cite the path), an answer the user gave, a Context7 or registry lookup you
-   actually performed, or an engineering trade-off you argue for **in the document itself**. A
-   sentence tracing to none of these is filler.
-3. **No choice without a cost.** Every ranking winner carries `Custo honesto:`; every §1 row names a
-   trade-off.
-4. **Adjectives need a number or an invariant behind them.** "rápido", "escalável", "robusto",
-   "seguro", "moderno", "performático" are banned on their own.
-5. **Every quality section names a negative** — what is *not* tested, measured, optimized, or used
-   for what. A negative constraint is the cheapest evidence that real thinking happened.
-6. **No happy path alone.** Every surface described has its exception state with a clear action.
-7. **The consequence rule.** Prefer the sentence naming the failure the rule prevents to the one
-   stating the rule. Weak: "marque elementos interativos com `no-drag`". Strong: "…com **cada**
-   elemento interativo marcado `no-drag` — esquecer isso torna botões inclicáveis". Do not
-   manufacture maxims for rules with no sharp edge; a forced one spends the credibility of the real
-   ones.
-8. **Generic sections end in specific content** — Padrões de código closes on this project's
-   counterintuitive decisions; Testes closes on this project's critical flows.
-9. **Mark what does not exist; do not invent it.** "**Não existe nos mocks**: desenhe no vocabulário
-   do DS e registre em `docs/design/…`". If the repo was not read, write "não verificado".
-10. **Banned outright:** "siga as boas práticas", "código limpo", "tratamento adequado de erros",
-    "conforme necessário", "quando aplicável", "TBD", "TODO", "etc.".
-11. **Conditional present means trigger satisfied.** If you cannot state the trigger that made a
-    section appear, delete the section.
+1. **Name-swap test.** Every section holds at least one claim that would be false in another
+   project. If it still reads fine with the product name swapped, rewrite it or cut it to one line.
+2. **Evidence provenance.** Every claim traces to a file you read (cite the path), an answer the
+   user gave, a lookup you performed, or a trade-off argued in the document itself.
+3. **Numbers, not adjectives.** "rápido", "escalável", "robusto", "seguro", "moderno" are banned
+   without a number or an invariant behind them.
+4. **The consequence, not the rule.** "…com **cada** elemento interativo marcado `no-drag` —
+   esquecer isso torna botões inclicáveis" beats "marque elementos com `no-drag`".
+5. **Mark what does not exist.** Write "não existe nos mocks" or "não verificado"; never invent.
+6. **Banned phrases:** the sweep in [review-checklist.md](review-checklist.md) is the single list —
+   "boas práticas", "código limpo", "conforme necessário", "TBD", "etc." and the rest.
 
 ---
 
 ## Calibration example
 
-[example-drive-clone.md](example-drive-clone.md) is a full greenfield document produced by an
-**earlier version** of this template — a Google Drive clone, 30 sections, three ranking sections.
-It predates §4 and Parte VII: it has no architecture diagram and no tasks, and its own numbering no
-longer mirrors the catalog above. Calibrate voice, rankings and honest cost against it; never
-calibrate structure. **Do not read it by default:**
-it is long, and the catalog above is the authority. Open it only when you need to calibrate one
-specific thing and the rule alone is not enough — what an honest cost actually sounds like, how a
-named antipattern closes a ranking, or how the exception-states sub-section reads when it is doing
-real work.
+[example-drive-clone.md](example-drive-clone.md) is a full greenfield plan in this format — a
+Google Drive clone at ~290 lines — a full product, close to the 300 ceiling on purpose: all 20
+sections, §10 as a table and ten tasks without code. Calibrate **form** against it, never length: a
+feature plan comes out at 80–150. **Do not
+read it by default:** the catalog above is the authority. Open it to calibrate one thing the rule
+alone does not settle — how short a section can honestly be, or what a task without code looks
+like.

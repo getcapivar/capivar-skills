@@ -4,12 +4,11 @@ Run this against the file **on disk** — read it back, do not grade what you me
 gap between intention and text is the entire point of this pass.
 
 This file is written so it can be handed **verbatim** to a `general-purpose` subagent along with
-nothing but the document's path. That is the strongest form of the check: a reviewer with no memory
-of the conversation cannot mentally supply the specificity that is missing from the page, which is
-exactly the defect being hunted.
+nothing but the document's path. A reviewer with no memory of the conversation cannot mentally
+supply the specificity that is missing from the page, which is exactly the defect being hunted.
 
 **Dispatch a subagent when** the document is greenfield (no repo to read means maximum fabrication
-risk) or carries more than two ranking sections. Otherwise offer it and let the user choose.
+risk) or longer than 250 lines. Otherwise run the checklist yourself.
 
 **Subagent prompt:**
 
@@ -24,68 +23,66 @@ caveat gets skipped and the defect ships.
 
 ---
 
-## Structure
+## Size and structure
 
-- [ ] Every `##` section is numbered, except `Sumário`; every `§N` in the text resolves to a section
-      that exists **and that actually contains what the pointer promises**
-- [ ] Sumário, if present, matches the real headings exactly (it is generated last, or it is wrong)
-- [ ] `---` between every section; prose hard-wrapped at 100 columns; **no table row wrapped**
-- [ ] Emoji only 🥇🥈🥉, only in ranking headings — nothing decorative anywhere
-- [ ] `- [ ]` checkboxes appear **only** in Resultado esperado and in the Parte VII tasks
-- [ ] No non-ranking section exceeds 400 words. The §4 diagram fence does not count — the prose
-      around it stays under 150 words — and Parte VII is outside the budget entirely
-- [ ] Parts I–VI: no implementation code, and fenced blocks only for the architecture diagram, the
-      file tree and state machines. Parte VII: code blocks present, because there they are required
-
-## Arquitetura (§4)
-
-- [ ] §4 carries an ASCII diagram in a fence, and **every box in the drawing has a row in the legend
-      table** — and every legend row has a box
-- [ ] Every component named anywhere else in the document appears in the diagram, or is explicitly
-      declared out of scope
-- [ ] The diagram draws processes, services and the boundaries that host them — not generic tiers.
-      "Frontend → Backend → Banco" fails the name-swap test and is not a topology
-- [ ] **Fronteiras invariáveis** names at least 2 arrows that may never exist, each with what breaks
-      if it does
-- [ ] No placeholder from the template skeleton survives (`<proc A>`, `<port>`, `<protocolo>`)
-- [ ] §4 does not restate §9 — it says *where things run*, not *how the hard part works*
+- [ ] **At most 300 lines**, diagram and tasks included; a feature in an existing repo lands near
+      80–150, a new application near 180–280 (a full product may approach 300). Over 300 means
+      two plans, not one long one
+- [ ] Every section stays within its line budget in the template; a section that does not apply is
+      **one line saying why**, never padded and never silently removed
+- [ ] Sections are `## 1.` to `## 20.` in order, then any conditional sections (`## 21.`…), then
+      `## Tarefas`. Every `§N` in the text resolves to a section that contains what it promises
+- [ ] Prose and bullets hard-wrapped at 100 columns; **no table row wrapped**; backticks on every
+      identifier, path, flag and env var; no "ver acima" — references are `§N`
+- [ ] §5 closes with a **Regra invariável** line
+- [ ] `- [ ]` checkboxes only in §20; fenced blocks only for the §4 diagram and an application's §5
+      tree; **no implementation code anywhere** — function signatures are fine
 
 ## Header
 
-- [ ] Every specialization named in `Papel:` has a corresponding section in the body
-- [ ] Every sentence of `Mentalidade de produção:` is implemented by a section
-- [ ] The title's parenthetical names the hard dimensions, not the stack
-- [ ] `Base:` provenance line present, with a real date and commit
+- [ ] `Contexto` states the problem, what prompted the plan and the observable result, plus the
+      failure asymmetry of this project — in 2–4 lines
+- [ ] The title's parenthetical names the hard dimensions, not the stack, and each one is answered
+      by a section
+- [ ] `Base:` present, with a real date — and the commit in brownfield; greenfield says "projeto
+      novo"
+
+## Arquitetura (§4)
+
+- [ ] An ASCII diagram in a fence, and **every box has a legend row** — and every legend row a box
+- [ ] It draws processes, services and the boundaries that host them — not tiers. "Frontend →
+      Backend → Banco" is not a topology
+- [ ] Every component named elsewhere in the document is in the diagram, or declared out of scope
+- [ ] **Fronteiras invariáveis** names 2–4 arrows that may never exist
+- [ ] No placeholder from the template skeleton survives (`<proc A>`, `<port>`, `<protocolo>`)
 
 ## Decisions
 
-- [ ] At least one ranking section, OR an explicit sentence in §1 saying why no decision in this
-      project is disputed
-- [ ] Each ranking: 3+ real options; `**ESCOLHA**` on the winner; `Custo honesto:` **exactly once**,
-      on the winner; `Contra:` on the losers; a closing Decisão. The antipattern in last place is
-      the one exception — it closes on "Não faça." and needs no `Contra:`
-- [ ] The runner-up is a genuine near-miss with a stated condition under which it wins
-- [ ] At least one migration trigger in the document is quantitative
-- [ ] Every decision stated anywhere in the body appears in the §1 table
-- [ ] No "Razão curta" is circular — a reason that merely restates the choice ("usamos X porque X é
-      bom") fails, as does a virtue with no trade-off ("é o padrão do mercado")
+- [ ] Every decision stated anywhere in the body appears in §1 or §10
+- [ ] No "Razão curta" is circular ("usamos X porque X é bom") or a virtue without a trade-off ("é o
+      padrão do mercado")
+- [ ] §10 is a table `Decisão | Escolha | Descartada | Custo | Migrar quando`, with 1–3 rows — or
+      one line saying why no decision in this project is disputed
+- [ ] In every §10 row the **cost is not empty**, the discarded option is one a competent engineer
+      would really propose, and the trigger is observable. At least one trigger in the document is
+      numeric
 
 ## Content
 
-- [ ] **Name-swap test passes in EVERY section.** Swap the product name: if a section still reads
-      fine, it is boilerplate. Each section holds at least one claim that would become false or
-      meaningless in another project
-- [ ] Every surface described has its exception state, with an action — no dead ends
-- [ ] Every quality section (Testes, Performance, Segurança, Observabilidade) names at least one
-      negative — what is *not* tested, measured, optimized, or used for what
-- [ ] Padrões de código closes on this project's counterintuitive decisions, not on generic rules
-- [ ] Metrics are named, not categorized ("taxa de falha por provider", not "métricas de erro")
-- [ ] Banned-phrase sweep returns nothing:
+- [ ] **Name-swap test passes in every section that is longer than one line.** Swap the product
+      name: if it still reads fine, it is boilerplate — rewrite it or cut it to one line
+- [ ] §8 names every surface, and **Estados de exceção** covers them — each state with its action,
+      and every error code of §12 handled. No dead ends
+- [ ] §11 Segurança, §16 Testes and §17 Observabilidade each name at least one negative; the one in
+      §11 is verified by a test
+- [ ] Metrics are named, not categorised ("taxa de falha por provider", not "métricas de erro")
+- [ ] Banned-phrase sweep returns nothing (case-sensitive — `TODO`, not the Portuguese "todo"):
 
 ```
 TBD | TODO | XXX | <\.\.\.> | a definir | boas práticas | código limpo |
 tratamento adequado | conforme necessário | quando aplicável | etc\. | entre outros |
-adequado | apropriado | robusto | escalável | moderno | performático | considere | avalie
+adequado | apropriado | robusto | escalável | moderno | performático | rápido | seguro |
+considere | avalie
 ```
 
   An adjective from that list survives only with a number or a verifiable invariant behind it.
@@ -93,46 +90,39 @@ adequado | apropriado | robusto | escalável | moderno | performático | conside
 ## Truth
 
 - [ ] **Every assumption A1…An was answered in the questionnaire, and none survives as a marker.**
-      Each became a §1 row, a plain statement, or an entry under "Perguntas em aberto". A saved
-      document full of assumption blocks is worse than one with an honest open-questions list
-- [ ] **Brownfield: every path under the "Reuso obrigatório" sub-section was verified to exist by
-      reading the filesystem**, not recalled from a directory listing. A reuse list naming a package
-      that is not there is the worst defect this document can carry — it sends the implementer
-      hunting for something that does not exist
-- [ ] **Greenfield: there is no "Reuso obrigatório" sub-section at all** (a "Regra de fallback"
-      sub-section is fine and expected), and no sentence describes anything as already existing. The
-      verb is "crie", never "reuse". In particular, no guide, ADR or convention document may be
-      cited as existing — a new repository has none
-- [ ] Every version number came from the target's manifest, from Context7, or from the registry.
-      Unverifiable ones were removed and absorbed into Política de versões
-- [ ] Nothing is described as existing in the mocks/design that is not there — gaps are marked, not
-      invented
-- [ ] No later section quietly contradicts a §1 decision
+      Each became a §1 row, a plain statement, or a line under "Perguntas em aberto" in §18
+- [ ] **Brownfield:** every path under `Reuso` in §3 was verified to exist on disk
+- [ ] **Greenfield:** nothing is described as already existing — no reused path, no guide, no ADR.
+      The verb is "crie", never "reuse"
+- [ ] Every version number came from the manifest, Context7 or the registry
+- [ ] Nothing is described as existing in the mocks that is not there — gaps are marked
+- [ ] No later section quietly contradicts a §1 or §10 decision
 
 ## Delivery
 
-- [ ] **Fase 2 is not empty.** If nothing was cut, there was no scope — go back and cut
-- [ ] Conditional sections that were evaluated and discarded and that a reader might miss are named
-      in Fase 2, not silently absent
-- [ ] Inventário: the "nunca embarcado" list is non-empty for anything shipped to a third party's
-      machine, and **no secret appears with a value**
-- [ ] Every Resultado esperado item is demonstrable by a human and maps to a section
-- [ ] The Parte VII preamble's item 1 is **not** "crie o repositório" / "instale as dependências" —
-      it is non-code work, a measurement, or the largest risk
+- [ ] **Fase 2 is not empty.** If nothing was cut, there was no scope
+- [ ] Every triggered conditional is its own §21+ section or folded into a core section; discarded
+      ones a reader might miss are named in Fase 2
+- [ ] Inventário: **no secret appears with a value**, and the "nunca embarcado" line names the test
+      that proves it
+- [ ] Every §20 item is demonstrable by a human and points at a section
 
-## Tarefas (Parte VII)
+## Tarefas
 
-- [ ] Every task carries `**Files:**` (exact paths), `**Interfaces:**` (Consumes/Produces with real
-      signatures) and steps with real code blocks. `/subagent-driven-development` extracts each
-      task's full text and hands it to a subagent that sees nothing else — a step without its code
-      is a task nobody can run
-- [ ] No placeholder from the "Sem placeholders" list survives — in particular no "igual à Tarefa N"
-- [ ] Types, functions and signatures used in a later task were defined in an earlier one, under the
-      same names
-- [ ] Tasks implement the **v1** of §18 only. Nothing from Fase 2 became a task, and no task
-      rests on a question still listed under `Perguntas em aberto`
-- [ ] **The last task creates `<target>/ARCHITECTURE.md`** from §4, and its Mermaid graph carries
-      the same nodes and the same directions as the ASCII diagram
+- [ ] The order of execution opens the part, ordered by risk, with 3–6 items, one carrying the
+      honest cut. Item 1 is not code — an external dependency, a measurement or a spike — and not
+      a decision still open
+- [ ] Every task has `Arquivos` (exact paths — no globs, no "testes ao lado"), `Interface`, `Teste`
+      with **a negative case** and
+      `Pronto quando` with an observable criterion — in 4–6 lines (heading not counted) and **with
+      no code**.
+      `/subagent-driven-development` hands each task's text to a subagent that sees nothing else
+- [ ] Every name a task uses is defined by that task or an earlier one; no "igual à T\<N\>"
+- [ ] Tasks implement the **v1** of §18 only, and none rests on a question in "Perguntas em aberto"
+- [ ] **The last task creates `<target>/ARCHITECTURE.md`** from §4: a Mermaid block with the same
+      nodes and directions, the component table, main flows, invariant boundaries, what the
+      diagram leaves out, and the "Atualize quando…" line
+- [ ] Every item of the v1 in §18 is built by some task — nothing promised is left without one
 
 ## File
 
@@ -141,19 +131,16 @@ adequado | apropriado | robusto | escalável | moderno | performático | conside
 - [ ] Date is the creation date; slug identifies the target and does not contain the word "plano"
 - [ ] `docs/plans/README.md` exists and its index table includes this document
 - [ ] Nothing was created outside `docs/plans/` — no scaffolding, no config, no source file, and
-      **no `ARCHITECTURE.md` at the repository root**: that file is the last task of the plan,
-      not an output of this skill
+      **no `ARCHITECTURE.md` at the repository root**: that file is the last task of the plan
 - [ ] **No file was written before the user approved the plan at GATE 2.** The only admissible
       exception is `CONTEXT.md` / `docs/adr/`, written by `domain-modeling` in the `grill-with-docs`
-      variant of the grill. This plan is the first file this skill created
+      variant of the grill
 
 ---
 
-## Thinness, not length
+## Short, not thin
 
-Length is not the target. The reference document runs 716 lines because a desktop app with a local
-inference runtime and bidirectional sync has that much load-bearing decision in it. A CRUD feature
-producing 700 lines was padded.
-
-The symptom to hunt is **thinness**: a section that is a bullet list of nouns with no consequences
-attached. Rewrite it with the failure each rule prevents, or cut it.
+Cutting is the default: a plan that holds 300 lines of load-bearing decision is rare, and a
+feature that produces 250 was padded. But short is not the same as thin. The symptom to hunt is a
+section that lists nouns with no consequence attached — rewrite it with the failure each rule
+prevents, or cut it to the one line that is true.

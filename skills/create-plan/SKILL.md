@@ -1,6 +1,6 @@
 ---
 name: create-plan
-description: "Use to turn an idea into the project's implementation plan — a dense, opinionated document saved as docs/plans/AAAA-MM-DD-<slug>.md in the TARGET repo, carrying closed decisions, the runtime architecture diagram, ranked technical choices (each with its honest cost and its migration trigger), v1 vs phase 2, and bite-sized tasks with exact paths and complete code, ready for /subagent-driven-development. Reads the target repo first, proposes an already-filled draft, and asks every question — interview, assumptions, grill, approvals — through the harness's native questionnaire tool (AskUserQuestion, Cursor's ask question tool, request_user_input, vscode/askQuestions, ask_user, question), answered by selecting and never printed in chat. Writes NOTHING until the user approves. Use when the user mentions 'create-plan', 'plano', 'plano de implementação', 'implementation plan', 'briefing', 'briefing do projeto', 'spec de marco', 'documentar o que vamos construir', or 'o que vamos construir'."
+description: "Use to turn an idea into the project's implementation plan — a dense, opinionated document saved as docs/plans/AAAA-MM-DD-<slug>.md in the TARGET repo, carrying closed decisions, the runtime architecture diagram, the hard-to-reverse decisions as a table (each with its cost and its migration trigger), v1 vs phase 2, and tasks with files, interface, test and done-criterion — no code — ready for /subagent-driven-development. About 200 lines, ceiling 300. Reads the target repo first, proposes an already-filled draft, and asks every question — interview, assumptions, grill, approvals — through the harness's native questionnaire tool (AskUserQuestion, Cursor's ask question tool, request_user_input, vscode/askQuestions, ask_user, question), answered by selecting and never printed in chat. Writes NOTHING until the user approves. Use when the user mentions 'create-plan', 'plano', 'plano de implementação', 'implementation plan', 'briefing', 'briefing do projeto', 'spec de marco', 'documentar o que vamos construir', or 'o que vamos construir'."
 ---
 
 # Create Plan (Ideia → Plano)
@@ -114,6 +114,12 @@ current mode, ask numbered questions in chat — and say so in one line.
 `<target>/docs/plans/AAAA-MM-DD-<slug>.md`, written in **PT-BR** (or the target repo's
 documentation language), following the section catalog in [template.md](template.md).
 
+**About 200 lines.** A feature in an existing repo lands at 80–150 lines, a new application at
+180–280, and **300 is the ceiling**, diagram and tasks included. The plan is read by an engineer —
+and executed by an agent — who must hold all of it at once: each section is as long as its
+complexity and no longer, a section that does not apply is one line saying why, and tasks carry
+what to build and how to know it is done, never the code.
+
 The date is the **creation** date and does not change when the document is revised — the revision
 history is git's. The slug identifies the target (`sonara-desktop`, `drive-clone`) and never
 repeats the word "plano"; the folder already says that.
@@ -197,8 +203,8 @@ Fallback, in order:
 **5. Choose the sections.** Read [template.md](template.md) **now**, not from memory. Walk the
 conditional trigger table answering yes/no to each. **§4 `Arquitetura do sistema` is core — it is
 always in, and never passes through the conditional table.** Then name the **1–3 decisions in this
-project that are hard to reverse** — those become ranking sections in step 8; everything else
-becomes a row in `Decisões fechadas`.
+project that are hard to reverse** — those become rows of the §10 table in step 8; everything
+else becomes a row in `Decisões fechadas`.
 
 **6. GATE 1 — section map in chat, everything else in the questionnaire.** Print in chat only the
 **section map** — each section you will include with a one-line justification, **and the
@@ -275,21 +281,23 @@ format of its own, and its questions go through the questionnaire too.
   assumption A1…An answered. There is no separate "did we reach a shared understanding?" question:
   GATE 2 is that question.
 - **Open questions.** What the grill cannot close becomes a line under `Perguntas em aberto`. And a
-  decision that is still open **never becomes a task** in Part VII — a task built on an unanswered
-  question is rework with verification steps attached.
+  decision that is still open **never becomes a task** — a task built on an unanswered question is
+  rework with verification steps attached.
 - **When `/specify` already ran**, its grill covered the glossary and the ADRs. The grill here is
   **not skipped, it is narrowed**: it attacks this plan's decisions and tasks and does not
   re-litigate terminology that is already closed.
 
-**8. Write the rankings** *in memory* for the decisions named in step 5, following the gabarito in
-[template.md](template.md). Respect its invariants — `Custo honesto:` exactly once and on the
-winner, a runner-up that is a real near-miss, at least one quantitative migration trigger.
+**8. Fill the §10 table** *in memory* for the decisions named in step 5 — one row each:
+`Decisão | Escolha | Descartada | Custo | Migrar quando`. The cost is never empty, the discarded
+option is one a competent engineer would really propose, and at least one trigger is numeric.
 
 **9. GATE 2 — approval before the first write.** Present the closed decisions, the topology, the
-rankings and the v1 / Fase 2 cut — **as decisions, not as a recap of questions and answers** — with
-the cheap assumptions from step 6 marked `assumido`. Then open **one** questionnaire:
+§10 table and the v1 / Fase 2 cut — **as decisions, not as a recap of questions and answers** —
+with the cheap assumptions from step 6 marked `assumido`. Then open **one** questionnaire:
 
 - **Escrever?** — write it now (recommended), adjust a decision first, or stop here;
+- **when the plan would pass 300 lines** — split it into two plans, with the cut you propose
+  (recommended), or write one plan over the ceiling;
 - **when a `docs/plans/*-<slug>.md` already exists** — revise it in place (the date does not change
   on revision) or write a new dated document that supersedes it. Never overwrite silently;
 - **when `docs/plans/` is new** — create its README, with the naming convention and the "pertence
@@ -305,9 +313,10 @@ that blocks writing — the plan mode of Claude Code, Cursor or Codex — that m
 stands in for "Escrever?": put the decision summary in the plan it asks for, and write once it is
 approved.
 
-**10. Write the document — Parts I–VI.** Hard-wrap prose at 100 columns; leave tables, fences and
-links alone — this file is reviewed as a diff. Open with the header block and the `Base:`
-provenance line (`leitura do repo em <data>, commit <sha curto>`).
+**10. Write the document — §1 to §20.** Hard-wrap prose at 100 columns; leave tables, fences and
+links alone — this file is reviewed as a diff. Open with the header block: title, `Contexto` and
+the `Base:` provenance line (`leitura do repo em <data>, commit <sha curto>`). Keep each section to
+its line budget in [template.md](template.md).
 
 - Write where GATE 2 decided — in place, or a new dated document. No question here: GATE 2 already
   asked it.
@@ -315,14 +324,16 @@ provenance line (`leitura do repo em <data>, commit <sha curto>`).
   in the same pass.
 - Do not commit here — the commit is a question on the GATE 3 questionnaire.
 
-**11. Write Part VII — the tasks.** Same file. The execution order opens it, the bite-sized tasks
-follow, and **the last task creates `<target>/ARCHITECTURE.md`** from §4. Tasks cover the **v1**
-only; nothing from Fase 2 becomes a task.
+**11. Write `## Tarefas`.** Same file. The execution order opens it, then the tasks — each one
+`Arquivos`, `Interface`, `Teste` (with a negative case) and `Pronto quando`, in 4–6 lines and with
+no code: the implementer subagent writes it test-first. **The last task creates
+`<target>/ARCHITECTURE.md`** from §4. Tasks cover the **v1** only; nothing from Fase 2 becomes a
+task.
 
 **12. Validate.** Re-read the file **from disk** — not from what you meant to write — and run
 [review-checklist.md](review-checklist.md). Dispatch the reviewer subagent when the document is
-greenfield or carries more than two rankings; otherwise run the checklist yourself — no question
-either way. Fix inline. Never present something that fails a check with a caveat attached.
+greenfield or longer than 250 lines; otherwise run the checklist yourself — no question either way.
+Fix inline. Never present something that fails a check with a caveat attached.
 
 **13. GATE 3 — review, commit and next step, in one questionnaire.** Say where it was written —
 "Escrito em `<path>`." — and open **one** questionnaire:
@@ -332,7 +343,7 @@ either way. Fix inline. Never present something that fails a check with a caveat
 - **Commit** — commit the plan now, or leave it uncommitted;
 - **Próximo passo** — the routes under Hand-off, your pick first.
 
-"Adjust" opens a multi-select of the parts to rewrite — §1–§6, §7–§12, §13–§20, Parte VII — with
+"Adjust" opens a multi-select of the parts to rewrite — §1–§6, §7–§12, §13–§20, Tarefas — with
 free text for what is wrong. Rewrite sections rather than defending them, re-run step 12, and open
 the same questionnaire again. Commit and route take effect only once the review is an explicit
 approval.
@@ -350,7 +361,7 @@ what differs is which evidence step runs, what §3 contains, and the modality of
 | §4 Arquitetura | you draw the target topology; every box is something you will create | draw **what runs today** first, then mark the new boxes. A diagram that omits what already runs is a proposal for a different system |
 | Structure | you propose the whole tree | you extend it, marking each node `(NOVO)` / `(EXISTENTE)` |
 | §1 Decisions | the ones you and the user are making now | ones already made (ADRs, guides) are **cited, not reopened** |
-| Rankings | rank freely | an option contradicting an existing ADR may only win with an explicit "isto reabre o ADR-000N porque…" |
+| §10 Decisões difíceis | choose freely | an option contradicting an existing ADR may only win with an explicit "isto reabre o ADR-000N porque…" |
 | Failure to guard against | **fabrication** — invented packages, invented versions | **ignoring what exists** — proposing a rewrite of something that works |
 
 **§Reuso obrigatório exists only in brownfield, and there it is mandatory.** Its absence in a
@@ -377,7 +388,7 @@ boundary. An unmarked tree is unreviewable.
 The route is the **Próximo passo** question on the GATE 3 questionnaire:
 
 - **Nothing open** → `/subagent-driven-development`, pointed at `docs/plans/<arquivo>`. It extracts
-  the tasks from Part VII and executes them with review between each.
+  the tasks from `## Tarefas` and executes them with review between each.
 - **Open questions about HOW to build it** (the technology is uncertain, the approach is not
   obvious) → `/discovery`, pointed at this document. It researches and brings evidence; you come
   back and revise the plan.
