@@ -62,7 +62,7 @@ npx skills remove discovery
 | `specify` | Capivar (fork de [obra/superpowers](https://github.com/obra/superpowers)) | **Opcional.** Brainstorm colaborativo + grilling adversarial contra o glossário e os ADRs → produz `docs/specs/AAAA-MM-DD-<topic>-design.md`, entradas no `CONTEXT.md` e ADRs. Inclui o visual companion. |
 | `to-prd` | Capivar (`capivar-code-docs`) | Transforma o contexto da conversa num PRD e publica como issue via `gh`. Rota de issue tracker. |
 | `to-issues` | Capivar (`capivar-code-docs`) | Quebra um plano/spec/PRD em issues independentes por fatias verticais (tracer bullets), via `gh`. Rota de issue tracker. |
-| `create-plan` | Capivar | Transforma uma ideia no **plano de implementação** (`docs/plans/AAAA-MM-DD-<slug>.md`): decisões fechadas, **diagrama de arquitetura de runtime**, escolhas técnicas ranqueadas com custo honesto e gatilho de migração, escopo v1 vs Fase 2, e as tarefas bite-sized com caminhos exatos, código completo e passos de verificação. Roda o grill e **não escreve nada até você aprovar**. Toda pergunta vem no questionário nativo do seu ADE (Claude Code, Cursor, Codex, Copilot, Gemini CLI, OpenCode) — você responde selecionando. É o caminho rápido: tudo antes dele é opcional. |
+| `create-plan` | Capivar | Transforma uma ideia no **plano de implementação** (`docs/plans/AAAA-MM-DD-<slug>.md`): decisões fechadas, **diagrama de arquitetura de runtime**, decisões difíceis com custo e gatilho de migração, escopo v1 vs Fase 2, e tarefas com arquivos, interface, teste e critério de pronto — sem código. **~200 linhas, teto de 300**, para ler rápido e caber no contexto da IA. Roda o grill e **não escreve nada até você aprovar**. Toda pergunta vem no questionário nativo do seu ADE (Claude Code, Cursor, Codex, Copilot, Gemini CLI, OpenCode) — você responde selecionando. É o caminho rápido: tudo antes dele é opcional. |
 | `grill-me` | [mattpocock/skills](https://github.com/mattpocock/skills) | Entrevista implacável sobre um plano ou design. Roteador fino sobre `grilling`. |
 | `grill-with-docs` | [mattpocock/skills](https://github.com/mattpocock/skills) | A mesma entrevista, mantendo `CONTEXT.md` e os ADRs afiados durante a sessão. Roteador sobre `grilling` + `domain-modeling`. A `create-plan` aplica o mesmo método, por questionário, quando o repo alvo tem `CONTEXT.md`. |
 | `grilling` | [mattpocock/skills](https://github.com/mattpocock/skills) | O motor da entrevista: mapeia as decisões como árvore, pergunta a fronteira inteira por rodada com resposta recomendada, e termina quando a fronteira esvazia. |
@@ -123,8 +123,8 @@ plano e nasce durante a implementação, não durante o planejamento.
   [obra/superpowers](https://github.com/obra/superpowers), com o caminho de saída trocado para
   `docs/specs/`, a fase de grilling acrescentada e o visual companion (`visual-companion.md` +
   `scripts/`).
-- `create-plan` é autoral, mas a Parte VII do seu template (forma da tarefa, granularidade
-  bite-sized, regra de "sem placeholders") deriva do `writing-plans` do mesmo repositório.
+- `create-plan` é autoral, mas as tarefas do seu template (dimensionamento da tarefa e regra de
+  "sem placeholders") derivam do `writing-plans` do mesmo repositório.
 - `to-prd` e `to-issues` foram extraídas do `capivar-code-docs` (onde se chamavam
   `capivar-to-prd` / `capivar-to-issues`) e dependem do `gh` CLI.
 - `create-plan` traz auxiliares ao lado do `SKILL.md`: `template.md` (catálogo de seções),
@@ -155,7 +155,7 @@ o frontmatter original (autor/licença) de seus repositórios de origem.
 
 A skill `specify` é **trabalho derivado** do `brainstorming` do
 [obra/superpowers](https://github.com/obra/superpowers) (MIT, Jesse Vincent) — o texto, o checklist,
-o fluxo e os scripts do visual companion vêm de lá; a Parte VII do template da `create-plan` deriva
+o fluxo e os scripts do visual companion vêm de lá; as tarefas do template da `create-plan` derivam
 do `writing-plans` do mesmo repositório. Crédito aos respectivos autores:
 [obra/superpowers](https://github.com/obra/superpowers),
 [JuliusBrussee/caveman](https://github.com/JuliusBrussee/caveman),
